@@ -54,10 +54,13 @@ def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='redd
         db_user='wes'): 
     """
     Queries the Reddit submission database. Only selects submissions from subreddits
-    within a set range of number of subscribers. Only selects text posts that have not
-    been deleted or removed.  Only selects submissions that are in subreddits previously
-    chosen to be labeled as not over 18, English only, and public (not archived or
-    private).
+    that have:
+        * number subscribers within a specified range
+        * not been deleted or removed
+        * not labeled as over 18
+        * English as language
+        * status as public (not private or archived)
+        * only contain a self post (text post)
     """
     engine = sqlalchemy.create_engine(f'postgresql://{db_user}@localhost/{db}')
     df = pd.read_sql(f"""
@@ -70,9 +73,15 @@ def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='redd
         and subreddit in (select display_name from subreddits);""", engine)
     engine.dispose()
 
-    # TODO: should this be a separate function?
-    if min_submissions != None:
-        sublist = df['subreddit'].value_counts() > min_submissions
-        df = df[df['subreddit'].isin(sublist[sublist].index.tolist())]
+    return df
 
+# TODO: use this in Jupyter notebook??
+def filter_by_min_submissions(df, min_submissions):
+    """
+    Only have submissions that are in subreddits that appear a minimum number of times
+    in the data set.
+    """
+        
+    sublist = df['subreddit'].value_counts() > min_submissions
+    df = df[df['subreddit'].isin(sublist[sublist].index.tolist())]
     return df
