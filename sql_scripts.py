@@ -31,7 +31,8 @@ def convert_submissions_json_to_sql(datafile, database='reddit_db', db_user='wes
 def convert_subreddits_json_to_sql(datafile='DATA/subreddits.json',
         database='reddit_db', db_user='wes'):
     """
-    Converts Reddit json subreddits file to SQL database
+    Converts Reddit json subreddits file to SQL database. Excludes adult content,
+    non-English content, and private & archived subreddits.
     """
     mykeys = ['display_name', 'description']
     dtypes = {'display_name': sqlalchemy.types.Text, 'description': sqlalchemy.types.Text}
@@ -48,3 +49,23 @@ def convert_subreddits_json_to_sql(datafile='DATA/subreddits.json',
         print(i)
 
     engine.dispose()
+
+def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='reddit_db', db_user='wes'):
+    """
+    Queries the Reddit submission database. Only selects submissions from subreddits
+    within a set range of number of subscribers. Only selects text posts that have not
+    been deleted or removed.  Only selects submissions that are in subreddits previously
+    chosen to be labeled as not over 18, English only, and public (not archived or
+    private).
+    """
+    engine = sqlalchemy.create_engine(f'postgresql://{db_user}@localhost/{db}')
+    df = pd.read_sql(f"""
+        select * from submissions 
+        where subreddit_subscribers > {subscribers_llimit} 
+        and subreddit_subscribers < {subscribers_ulimit}
+        and is_self = 'True' 
+        and selftext <> '[deleted]' 
+        and selftext <> '[removed]' 
+        and subreddit in (select display_name from subreddits);""", engine)
+    engine.dispose()
+    return df
