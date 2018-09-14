@@ -50,7 +50,8 @@ def convert_subreddits_json_to_sql(datafile='DATA/subreddits.json',
 
     engine.dispose()
 
-def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='reddit_db', db_user='wes'):
+def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='reddit_db',
+        db_user='wes'): 
     """
     Queries the Reddit submission database. Only selects submissions from subreddits
     within a set range of number of subscribers. Only selects text posts that have not
@@ -68,4 +69,10 @@ def query_submissions(subscribers_llimit=1000, subscribers_ulimit=1500, db='redd
         and selftext <> '[removed]' 
         and subreddit in (select display_name from subreddits);""", engine)
     engine.dispose()
+
+    # TODO: should this be a separate function?
+    if min_submissions != None:
+        sublist = df['subreddit'].value_counts() > min_submissions
+        df = df[df['subreddit'].isin(sublist[sublist].index.tolist())]
+
     return df
