@@ -2,6 +2,8 @@
 # Some useful functions for converting flat files from Reddit corpus into SQL database.
 # Also includes function to query from Reddit SQL database.
 
+# Data source: https://files.pushshift.io/reddit/
+
 import pandas as pd
 import sqlalchemy
 
