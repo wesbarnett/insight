@@ -14,7 +14,6 @@ import sql_scripts
 
 memory = Memory("./cachedir", verbose=10, compress=True)
 
-
 @memory.cache
 def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100):
 
@@ -32,16 +31,14 @@ def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100
 
     print(f"Number of submissions selected: {df.shape[0]}")
 
-    # TODO: Include title text
-    X = df["selftext"]
+    X = df['title'] + ' ' + df["selftext"]
     y = df["subreddit"]
 
-    # Needed for OneVsRestClassifier
-    lb = LabelBinarizer()
-    y = lb.fit_transform(y)
+    # Needed for OneVsRestClassifier (see TODO below).
+#   lb = LabelBinarizer()
+#   y = lb.fit_transform(y)
 
     return X, y
-
 
 X, y = get_data(1e3, 1e4, 500)
 
@@ -53,29 +50,35 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 # https://stackoverflow.com/questions/26210471/scikit-learn-gridsearch-giving-valueerror-multiclass-format-is-not-supported#26210645
 pipeline = make_pipeline(
     CountVectorizer(
-        decode_error="ignore", binary=True, analyzer=nlp_scripts.stemmed_words
+        decode_error="ignore", binary=True, analyzer=nlp_scripts.stemmed_words,
+        max_features=2000
     ),
-    OneVsRestClassifier(BernoulliNB()),
+    BernoulliNB(),
 )
 
-tuned_parameters = [{"countvectorizer__max_features": [1000, 2000]}]
+pipeline.fit(X, y)
+dump(pipeline, 'pipeline.gz')
 
-clf_cv = GridSearchCV(
-    pipeline,
-    param_grid=tuned_parameters,
-    scoring="roc_auc",
-    return_train_score=True,
-    verbose=10,
-    n_jobs=2,
-    cv=5,
-)
+# TODO: ROC_AUC only work with OneVsRest, but right now can't figure out why it's acting
+# strange when I do predictions. Predictions from above code work fine. Need to revisit.
+#tuned_parameters = [{"countvectorizer__max_features": [1000, 2000]}]
 
-clf_cv.fit(X_train, y_train)
-dump(clf_cv, "clf_cv.gz")
+#clf_cv = GridSearchCV(
+#    pipeline,
+#    param_grid=tuned_parameters,
+#    scoring="roc_auc",
+#    return_train_score=True,
+#    verbose=10,
+#    n_jobs=2,
+#    cv=5,
+#)
 
-y_score = clf_cv.predict_proba(X_test)
-print(f"Test score: {roc_auc_score(y_test, y_score)}")
+#clf_cv.fit(X_train, y_train)
+#dump(clf_cv, "clf_cv.gz")
+
+#y_score = clf_cv.predict_proba(X_test)
+#print(f"Test score: {roc_auc_score(y_test, y_score)}")
 
 # Train model on entire data set
-clf_best = clf_cv.best_estimator_.fit(X, y)
-dump(clf_best, "clf_best.gz")
+#clf_best = clf_cv.best_estimator_.fit(X, y)
+#dump(clf_best, "clf_best.gz")
