@@ -2,7 +2,9 @@ DATA
 DEMOS
 OLD
 *.png
-
+*.gz
+*.ipynb
+cachedir
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
