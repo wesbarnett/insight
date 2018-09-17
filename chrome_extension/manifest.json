@@ -5,6 +5,6 @@
 	"manifest_version": 2,
     "content_scripts": [ {
         "js": ["thirdParty/jquery-3.3.1.min.js", "main.js"],
-        "matches": [ "https://*reddit.com/*" ]
+        "matches": [ "https://www.reddit.com/submit*" ]
     } ]
 }
