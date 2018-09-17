@@ -31,7 +31,9 @@ y = df["subreddit"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 # This pipeline takes 7 minutes to run on my system when max_features = 200
-# and about 281302 submissions selected
+# and about 281302 submissions selected and binary = True. Obviously those settings
+# needs to change, but it's a benchmark.
+# TODO: Use MulitnomialNB with binary = False
 pipeline = make_pipeline(
     CountVectorizer(
         decode_error="ignore", binary=True, analyzer=nlp_scripts.stemmed_words,
