@@ -13,7 +13,6 @@ import sql_scripts
 
 memory = Memory("./cachedir", verbose=10, compress=True)
 
-
 @memory.cache
 def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100):
 
@@ -43,7 +42,6 @@ def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
     return X_train, X_test, y_train, y_test
-
 
 X_train, X_test, y_train, y_test = get_data()
 
