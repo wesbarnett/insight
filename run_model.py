@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from joblib import dump, Memory
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.naive_bayes import BernoulliNB
@@ -12,6 +13,7 @@ from sklearn.preprocessing import LabelBinarizer
 import sql_scripts
 
 memory = Memory("./cachedir", verbose=10, compress=True)
+
 
 @memory.cache
 def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100):
@@ -35,20 +37,16 @@ def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100
     y = df["subreddit"]
 
     # Needed for OneVsRestClassifier
-    lb = labelBinarizer()
+    lb = LabelBinarizer()
     y = lb.fit_transform(y)
 
-    # TODO: stratify?
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    return X, y
 
-    return X_train, X_test, y_train, y_test
 
-X_train, X_test, y_train, y_test = get_data()
+X, y = get_data(1e3, 1e4, 500)
 
-# This pipeline takes 7 minutes to run on my system when max_features = 200
-# and about 281302 submissions selected and binary = True. Obviously those settings
-# needs to change, but it's a benchmark.
-# TODO: Use MulitnomialNB with binary = False
+# TODO: stratify?
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 # Multiclass format is not supported when doing ROC AUC, so targets need to be binarized
 # (as above)
@@ -60,9 +58,9 @@ pipeline = make_pipeline(
     OneVsRestClassifier(BernoulliNB()),
 )
 
-tuned_parameters = [{"countvectorizer__max_features": [200, 500, 1000, 2000]}]
+tuned_parameters = [{"countvectorizer__max_features": [1000, 2000]}]
 
-clf = GridSearchCV(
+clf_cv = GridSearchCV(
     pipeline,
     param_grid=tuned_parameters,
     scoring="roc_auc",
@@ -72,5 +70,12 @@ clf = GridSearchCV(
     cv=5,
 )
 
-clf.fit(X_train, y_train)
-dump(clf, "clf.gz")
+clf_cv.fit(X_train, y_train)
+dump(clf_cv, "clf_cv.gz")
+
+y_score = clf_cv.predict_proba(X_test)
+print(f"Test score: {roc_auc_score(y_test, y_score)}")
+
+# Train model on entire data set
+clf_best = clf_cv.best_estimator_.fit(X, y)
+dump(clf_best, "clf_best.gz")
