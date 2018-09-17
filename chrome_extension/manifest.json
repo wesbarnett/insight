@@ -1,0 +1,10 @@
+{
+	"name": "Insight Project",
+	"version": "0.1",
+	"description": "Build an Extension!",
+	"manifest_version": 2,
+    "content_scripts": [ {
+        "js": ["thirdParty/jquery-3.3.1.min.js", "main.js"],
+        "matches": [ "https://*/*" ]
+    } ]
+}
