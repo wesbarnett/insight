@@ -9,7 +9,6 @@ $(document).ready(function() {
 function handler() {
 	var title = $('#title-field').find('textarea[name="title"]').val();
 	var text = $('#text-field').find('textarea[name="text"]').val();
-    alert('clicked');
 	$.ajax
 	({
 		type: "POST",
@@ -19,7 +18,6 @@ function handler() {
 		data: JSON.stringify({ "title": title, "text" : text}),
 		contentType: "application/json",
 		success: function (result) {
-            alert('success');
             // TODO: Make this a link the user can click and then populate the "choose
             // where to post" field.
             $('#insightsuggestions').html("<h1>" + result["result"] + "</h1>");
