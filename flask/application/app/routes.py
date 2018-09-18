@@ -6,6 +6,12 @@ from joblib import load
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
+    """
+    This route will be accessed remotely from the Chrome extension. It takes the user
+    input (which is the Reddit submission's title and text and runs a prediction on it
+    based on our previously trained model. Then it returns the results back to the
+    extension so it can display them.
+    """
     content = request.json
     print(content)
     title = content['title']
