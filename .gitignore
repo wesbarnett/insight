@@ -1,6 +1,7 @@
 DATA
 DEMOS
 OLD
+EDA
 *.png
 *.gz
 *.ipynb
