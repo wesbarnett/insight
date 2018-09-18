@@ -18,10 +18,12 @@ function handler() {
 		data: JSON.stringify({ "title": title, "text" : text}),
 		contentType: "application/json",
 		success: function (result) {
-            $('#suggested-reddits').append(result["result"]);
+            // TODO: Make this a link the user can click and then populate the "choose
+            // where to post" field.
+            $('#insightsuggestions').html("<h1>" + result["result"] + "</h1>");
 		}
 	});
 }
 
 // Create a link with a specific ID that will be clicked
-$('#suggested-reddits').append('<h1><a href="javascript:void(0);" id="insightlink">Give me suggestions</a></h1>');
+$('#suggested-reddits').append('<h1><a href="javascript:void(0);" id="insightlink">Give me suggestions</a></h1><div id="insightsuggestions"></div>');
