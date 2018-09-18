@@ -2,12 +2,13 @@ from app import app
 from flask import Flask, request, jsonify
 from joblib import load
 
-# TODO: Only suggests one subreddit currently. Want to suggest at least a few.
+# TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
+# threshold?
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return "It works!"
+    return "It works!\n"
 
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
@@ -24,8 +25,10 @@ def add_message(uuid):
     X = title + ' ' + text
     wwwdir = '/var/www/apache-flask/application'
     clf = load(wwwdir + '/pipeline.gz')
-    prediction = clf.predict([X])[0]
-    return jsonify({"result": prediction})
+    argsorted_probs = clf.predict_proba([doc]).argsort()[0][::-1]
+    sorted_classes = clf.classes_[argsorted_probs]
+    selected_predictions = list(sorted_classes[:3])
+    return jsonify({"result": [selected_predictions]})
 
 if __name__ == '__main__':
     app.run(host= '0.0.0.0',debug=True)
