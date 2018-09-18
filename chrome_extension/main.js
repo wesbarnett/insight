@@ -12,7 +12,7 @@ function handler() {
 	$.ajax
 	({
 		type: "POST",
-		url: "http://localhost:8080/api/add_message/1234",
+		url: "http://insight.barnett.science/api/add_message/1234",
 		dataType: "json",
 		async: false,
 		data: JSON.stringify({ "title": title, "text" : text}),
