@@ -4,6 +4,11 @@ from joblib import load
 
 # TODO: Only suggests one subreddit currently. Want to suggest at least a few.
 
+@app.route('/')
+@app.route('/index')
+def index():
+    return "It works!"
+
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
     """
