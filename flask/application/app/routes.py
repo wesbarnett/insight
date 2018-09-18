@@ -24,11 +24,14 @@ def add_message(uuid):
     text = content['text']
     X = title + ' ' + text
     wwwdir = '/var/www/apache-flask/application'
+    # TODO: Remove when done testing locally
+    #wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
     clf = load(wwwdir + '/pipeline.gz')
-    argsorted_probs = clf.predict_proba([doc]).argsort()[0][::-1]
+    argsorted_probs = clf.predict_proba([X]).argsort()[0][::-1]
     sorted_classes = clf.classes_[argsorted_probs]
     selected_predictions = list(sorted_classes[:3])
-    return jsonify({"result": [selected_predictions]})
+    print(selected_predictions)
+    return jsonify(selected_predictions)
 
 if __name__ == '__main__':
     app.run(host= '0.0.0.0',debug=True)
