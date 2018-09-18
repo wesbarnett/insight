@@ -11,7 +11,8 @@ def add_message(uuid):
     title = content['title']
     text = content['text']
     X = title + ' ' + text
-    clf = load('pipeline.gz')
+    wwwdir = '/var/www/apache-flask/application'
+    clf = load(wwwdir + '/pipeline.gz')
     prediction = clf.predict([X])[0]
     return jsonify({"result": prediction})
 
