@@ -17,8 +17,8 @@ function handler() {
 		async: false,
 		data: JSON.stringify({ "title": title, "text" : text}),
 		contentType: "application/json",
-		success: function () {
-			alert(title); 
+		success: function (result) {
+            $('#suggested-reddits').append(result["result"]);
 		}
 	});
 }
