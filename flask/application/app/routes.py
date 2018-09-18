@@ -2,6 +2,8 @@ from app import app
 from flask import Flask, request, jsonify
 from joblib import load
 
+# TODO: Only suggests one subreddit currently. Want to suggest at least a few.
+
 @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
 def add_message(uuid):
     content = request.json
