@@ -71,10 +71,11 @@ def convert_subreddits_json_to_sql(
     db_user : string, optional, default: wes
         Name of the SQL database user
     """
-    mykeys = ["display_name", "description"]
+    mykeys = ["display_name", "description", "subscribers"]
     dtypes = {
         "display_name": sqlalchemy.types.Text,
         "description": sqlalchemy.types.Text,
+        "subscribers": sqlalchemy.types.Integer,
     }
     engine = sqlalchemy.create_engine(f"postgresql://{db_user}@localhost/{database}")
     reader = pd.read_json(datafile, lines=True, chunksize=10000, dtype=False)
@@ -95,7 +96,7 @@ def convert_subreddits_json_to_sql(
 
 
 def query_submissions(
-    subscribers_llimit=1000, subscribers_ulimit=1500, db="reddit_db", db_user="wes"
+    subscribers_llimit=1000, subscribers_ulimit=1500, chunksize=None, db="reddit_db", db_user="wes"
 ):
     """Queries the Reddit submission database. Only selects submissions from subreddits
     that have:
@@ -120,17 +121,31 @@ def query_submissions(
         Name of the SQL database user
     """
     engine = sqlalchemy.create_engine(f"postgresql://{db_user}@localhost/{db}")
-    df = pd.read_sql(
-        f"""
-        select * from submissions 
-        where subreddit_subscribers > {subscribers_llimit} 
-        and subreddit_subscribers < {subscribers_ulimit}
-        and is_self = 'True' 
-        and selftext <> '[deleted]' 
-        and selftext <> '[removed]' 
-        and subreddit in (select display_name from subreddits);""",
-        engine,
-    )
+    if subscribers_ulimit != None:
+        df = pd.read_sql(
+            f"""
+            select title, selftext, subreddit from submissions 
+            where subreddit_subscribers > {subscribers_llimit} 
+            and subreddit_subscribers < {subscribers_ulimit}
+            and is_self = 'True' 
+            and selftext <> '[deleted]' 
+            and selftext <> '[removed]' 
+            and subreddit in (select display_name from subreddits);""",
+            engine,
+            chunksize=chunksize
+        )
+    else:
+        df = pd.read_sql(
+            f"""
+            select title, selftext, subreddit from submissions 
+            where subreddit_subscribers > {subscribers_llimit} 
+            and is_self = 'True' 
+            and selftext <> '[deleted]' 
+            and selftext <> '[removed]' 
+            and subreddit in (select display_name from subreddits);""",
+            engine,
+            chunksize=chunksize
+        )
     engine.dispose()
 
     return df
