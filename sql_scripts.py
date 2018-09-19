@@ -7,6 +7,7 @@
 import pandas as pd
 import sqlalchemy
 
+
 def convert_submissions_json_to_sql(datafile, database="reddit_db", db_user="wes"):
     """Converts Reddit json submissions file to SQL database.
 
@@ -96,7 +97,11 @@ def convert_subreddits_json_to_sql(
 
 
 def query_submissions(
-    subscribers_llimit=1000, subscribers_ulimit=1500, chunksize=None, db="reddit_db", db_user="wes"
+    subscribers_llimit=1000,
+    subscribers_ulimit=1500,
+    chunksize=None,
+    db="reddit_db",
+    db_user="wes",
 ):
     """Queries the Reddit submission database. Only selects submissions from subreddits
     that have:
@@ -130,9 +135,11 @@ def query_submissions(
             and is_self = 'True' 
             and selftext <> '[deleted]' 
             and selftext <> '[removed]' 
-            and subreddit in (select display_name from subreddits);""",
+            and subreddit in (select display_name from subreddits
+                where subscribers > {subscribers_llimit}
+                and subscribers < {subscribers_ulimit});""",
             engine,
-            chunksize=chunksize
+            chunksize=chunksize,
         )
     else:
         df = pd.read_sql(
@@ -142,9 +149,10 @@ def query_submissions(
             and is_self = 'True' 
             and selftext <> '[deleted]' 
             and selftext <> '[removed]' 
-            and subreddit in (select display_name from subreddits);""",
+            and subreddit in (select display_name from subreddits
+                where subscribers > {subscribers_llimit});""",
             engine,
-            chunksize=chunksize
+            chunksize=chunksize,
         )
     engine.dispose()
 
