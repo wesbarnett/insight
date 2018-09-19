@@ -12,9 +12,9 @@ function handler() {
 	$.ajax
 	({
 		type: "POST",
-		url: "https://insight.barnett.science/api/add_message/1234",
+		//url: "https://insight.barnett.science/api/add_message/1234",
         // TODO: remove following after done with local testing
-		//url: "http://localhost:8080/api/add_message/1234",
+		url: "http://localhost:8080/api/add_message/1234",
 		dataType: "json",
 		async: false,
 		data: JSON.stringify({ "title": title, "text" : text}),
@@ -22,8 +22,11 @@ function handler() {
 		success: function (result) {
             // TODO: Make this a link the user can click and then populate the "choose
             // where to post" field or add link to subscribe.
+            $('#insightsuggestions').text("");
             for (var i = 0; i < result.length; i++) {
-                $('#insightsuggestions').append("<h1>" + result[i] + "</h1>");
+                $('#insightsuggestions').append("<ol>");
+                $('#insightsuggestions').append("<li>" + result[i] + "</li>");
+                $('#insightsuggestions').append("</ol>");
             }
 		}
 	});
