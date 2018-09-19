@@ -21,7 +21,7 @@ function handler() {
 		contentType: "application/json",
 		success: function (result) {
             // TODO: Make this a link the user can click and then populate the "choose
-            // where to post" field.
+            // where to post" field or add link to subscribe.
             for (var i = 0; i < result.length; i++) {
                 $('#insightsuggestions').append("<h1>" + result[i] + "</h1>");
             }

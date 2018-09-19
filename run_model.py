@@ -40,7 +40,7 @@ def get_data(subscribers_llimit=1e3, subscribers_ulimit=1e4, min_submissions=100
 
     return X, y
 
-X, y = get_data(1e3, 1e4, 500)
+X, y = get_data(1e5, None, 500)
 
 # TODO: stratify?
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
