@@ -12,9 +12,9 @@ function handler() {
 	$.ajax
 	({
 		type: "POST",
-		//url: "https://insight.barnett.science/api/add_message/1234",
+		url: "https://insight.barnett.science/api/add_message/1234",
         // TODO: remove following after done with local testing
-		url: "http://localhost:8080/api/add_message/1234",
+		//url: "http://localhost:8080/api/add_message/1234",
 		dataType: "json",
 		async: false,
 		data: JSON.stringify({ "title": title, "text" : text}),
