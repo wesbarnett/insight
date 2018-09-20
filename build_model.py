@@ -11,18 +11,20 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 import sqlalchemy
 import sql_scripts
 
+
+subscribers_ulimit = None
+subscribers_llimit = 1e5
+cv_chunks = 1
+chunksize = 1e4
+table_name = "submissions_large"
+outfile = "MODELS/sgd_large.gz"
+
 def parse_data_chunk(chunk):
     X = chunk["title"] + " " + chunk["selftext"]
     y = chunk["subreddit"]
     del chunk
     X = vectorizer.transform(X)
     return X, y
-
-subscribers_ulimit = None
-subscribers_llimit = 1e5
-
-cv_chunks = 1
-chunksize = 1e4
 
 # For test set and validation set
 limit = chunksize*cv_chunks*2
@@ -44,7 +46,7 @@ vectorizer = HashingVectorizer(
 
 print(f"Number of classes: {classes.shape[0]}")
 
-df = pd.read_sql(f"select * from submissions_large limit {limit};", engine,
+df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
         chunksize=chunksize)
 
 # Hold out test set (8 chunks)
@@ -60,10 +62,10 @@ print("Training models...")
 for i, alpha in enumerate(np.logspace(-7,-5,3)):
 
     # Logistic Regression because we want probabilities; default is SVM
-    sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, loss="log", max_iter=1000, tol=1e-3)
+    sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3)
 
 #FIXME
-    df = pd.read_sql("select * from submissions_large limit 50000;", engine,
+    df = pd.read_sql("select * from {table_name} limit 50000;", engine,
             chunksize=chunksize)
 
     # Skip hold out test set and validation set
@@ -85,7 +87,7 @@ for i, alpha in enumerate(np.logspace(-7,-5,3)):
         del y_train
 
     # Re-read from beginning of table
-    df = pd.read_sql(f"select * from submissions_large limit {limit};", engine,
+    df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
             chunksize=chunksize)
 
     # Skip hold out test set
@@ -131,10 +133,10 @@ del sgd_cv_scores
 print("Performing training on entire training set...")
 
 # FIXME
-df = pd.read_sql(f"select * from submissions_large limit 50000;", engine,
+df = pd.read_sql(f"select * from {table_name} limit 50000;", engine,
         chunksize=chunksize)
 
-sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, loss="log", max_iter=1000, tol=1e-3)
+sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
 
 # Skip test set
 for i in range(cv_chunks):
@@ -149,7 +151,7 @@ for chunk in df:
     del X_train
     del y_train
 
-df = pd.read_sql(f"select * from submissions_large limit {limit};", engine,
+df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
         chunksize=chunksize)
 
 print("Getting average test score...")
@@ -170,12 +172,13 @@ print(f"test score = {score_avg}")
 del sgd_train
 
 ############## Entire data set
-sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, loss="log", max_iter=1000, tol=1e-3)
+sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
 print("Performing training on entire data set...")
 # FIXME
-df = pd.read_sql(f"select * from submissions_large limit 50000;", engine,
+df = pd.read_sql(f"select * from {table_name} limit 50000;", engine,
         chunksize=chunksize)
 
+j = 0
 for chunk in df:
 
     j += chunk.shape[0]
@@ -189,6 +192,6 @@ for chunk in df:
     del y
 
 # Save the model!
-dump(sgd, "sgd.gz")
+dump(sgd, outfile)
 
 engine.dispose()
