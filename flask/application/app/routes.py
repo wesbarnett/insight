@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from joblib import load
 import nlp_scripts
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -15,12 +15,12 @@ vectorizer = HashingVectorizer(
 #wwwdir = "/var/www/apache-flask/application"
 # TODO: Remove when done testing locally
 wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
-clf = load(wwwdir + "/sgd")
+clf = load(wwwdir + "/sgd.gz")
 
 @app.route("/")
 @app.route("/index")
 def index():
-    return "It works!\n"
+    return render_template("index.html", page="index")
 
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
 def add_message(uuid):
