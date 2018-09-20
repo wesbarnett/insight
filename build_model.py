@@ -24,15 +24,15 @@ def parse_data_chunk(chunk):
 
 model_large = {"subscribers_ulimit": None, "subscribers_llimit": 1e5, "cv_chunks": 8,
         "chunksize": 1e4, "table_name": "submissions_large", "outfile":
-        "MODELS/sgd_large.gz"}
+        "MODELS/sgd_svm_large.gz"}
 
 model_med = {"subscribers_ulimit": 1e5, "subscribers_llimit": 5e4, "cv_chunks": 3,
         "chunksize": 1e4, "table_name": "submissions_med", "outfile":
-        "MODELS/sgd_med.gz"}
+        "MODELS/sgd_svm_med.gz"}
 
 model_small = {"subscribers_ulimit": 5e4, "subscribers_llimit": 1e4, "cv_chunks": 6,
-        "chunksize": 1e4, "table_name": "submissions_med", "outfile":
-        "MODELS/sgd_med.gz"}
+        "chunksize": 1e4, "table_name": "submissions_small", "outfile":
+        "MODELS/sgd_svm_small.gz"}
 
 models = [model_small, model_med, model_large]
 
@@ -85,15 +85,12 @@ for model in models:
     sgd_cv_scores = {}
     best_score = 0.
     print("Training models...")
-# FIXME
-    #for i, alpha in enumerate(np.logspace(-7,-3,5)):
-    for i, alpha in enumerate(np.logspace(-7,-5,3)):
+    for i, alpha in enumerate(np.logspace(-7,-3,5)):
 
         # Logistic Regression because we want probabilities; default is SVM
         sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3)
 
-#FIXME
-        df = pd.read_sql(f"select * from {table_name} limit 50000;", engine,
+        df = pd.read_sql(f"select * from {table_name};", engine,
                 chunksize=chunksize)
 
         # Skip hold out test set and validation set
@@ -160,8 +157,7 @@ for model in models:
     ############## Training set (including validation set)
     print("Performing training on entire training set...")
 
-# FIXME
-    df = pd.read_sql(f"select * from {table_name} limit 50000;", engine,
+    df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
 
     sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
@@ -202,8 +198,8 @@ for model in models:
     ############## Entire data set
     sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
     print("Performing training on entire data set...")
-# FIXME
-    df = pd.read_sql(f"select * from {table_name} limit 50000;", engine,
+
+    df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
 
     j = 0
