@@ -1,10 +1,16 @@
 from app import app
 from flask import Flask, request, jsonify
 from joblib import load
+import nlp_scripts
+from sklearn.feature_extraction.text import HashingVectorizer
 
 # TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
 # threshold?
 
+vectorizer = HashingVectorizer(
+    decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2 ** 18,
+    alternate_sign=False
+)
 
 @app.route("/")
 @app.route("/index")
@@ -25,11 +31,12 @@ def add_message(uuid):
     title = content["title"]
     text = content["text"]
     X = title + " " + text
-    wwwdir = "/var/www/apache-flask/application"
+    X = vectorizer.transform([X])
+    #wwwdir = "/var/www/apache-flask/application"
     # TODO: Remove when done testing locally
-    # wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
-    clf = load(wwwdir + "/pipeline.gz")
-    argsorted_probs = clf.predict_proba([X]).argsort()[0][::-1]
+    wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
+    clf = load(wwwdir + "/sgd.gz")
+    argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
     sorted_classes = clf.classes_[argsorted_probs]
     selected_predictions = list(sorted_classes[:3])
     print(selected_predictions)
