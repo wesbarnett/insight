@@ -12,11 +12,15 @@ vectorizer = HashingVectorizer(
     alternate_sign=False
 )
 
+#wwwdir = "/var/www/apache-flask/application"
+# TODO: Remove when done testing locally
+wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
+clf = load(wwwdir + "/sgd")
+
 @app.route("/")
 @app.route("/index")
 def index():
     return "It works!\n"
-
 
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
 def add_message(uuid):
@@ -32,16 +36,12 @@ def add_message(uuid):
     text = content["text"]
     X = title + " " + text
     X = vectorizer.transform([X])
-    #wwwdir = "/var/www/apache-flask/application"
-    # TODO: Remove when done testing locally
-    wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
-    clf = load(wwwdir + "/sgd.gz")
+
     argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
     sorted_classes = clf.classes_[argsorted_probs]
     selected_predictions = list(sorted_classes[:3])
-    print(selected_predictions)
-    return jsonify(selected_predictions)
 
+    return jsonify(selected_predictions)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
