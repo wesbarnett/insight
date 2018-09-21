@@ -34,7 +34,9 @@ model_small = {"subscribers_ulimit": 5e4, "subscribers_llimit": 1e4, "cv_chunks"
         "chunksize": 1e4, "table_name": "submissions_small", "outfile":
         "MODELS/sgd_svm_small.gz"}
 
-models = [model_small, model_med, model_large]
+#TODO: Limit small model more
+#models = [model_small, model_med, model_large]
+models = [model_med, model_large]
 
 for model in models:
 
