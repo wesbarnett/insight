@@ -1,5 +1,7 @@
 # Parameter selection using cross-validation
 
+# TODO: Learning curves?
+
 import nlp_scripts
 import numpy as np
 import pandas as pd
@@ -11,7 +13,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 import sqlalchemy
 import sql_scripts
 
-def parse_data_chunk(chunk):
+def parse_data_chunk(chunk, vectorizer):
     X = chunk["title"] + " " + chunk["selftext"]
     y = chunk["subreddit"]
     del chunk
@@ -22,21 +24,29 @@ def parse_data_chunk(chunk):
 # large = "large subreddit (in number of subscribers, etc."
 # CV and test size is about 10% of total data set
 
-model_large = {"subscribers_ulimit": None, "subscribers_llimit": 1e5, "cv_chunks": 8,
-        "chunksize": 1e4, "table_name": "submissions_large", "outfile":
+# 711014
+model_large = {"subscribers_ulimit": None, "subscribers_llimit": 1.3e5, "cv_chunks": 1,
+        "chunksize": 7e4, "table_name": "submissions_0", "outfile":
         "MODELS/sgd_svm_large.gz"}
 
-model_med = {"subscribers_ulimit": 1e5, "subscribers_llimit": 5e4, "cv_chunks": 3,
-        "chunksize": 1e4, "table_name": "submissions_med", "outfile":
+# 452885
+model_med = {"subscribers_ulimit": 1.3e5, "subscribers_llimit": 5.5e4, "cv_chunks": 1,
+        "chunksize": 4e4, "table_name": "submissions_1", "outfile":
         "MODELS/sgd_svm_med.gz"}
 
-model_small = {"subscribers_ulimit": 5e4, "subscribers_llimit": 1e4, "cv_chunks": 6,
-        "chunksize": 1e4, "table_name": "submissions_small", "outfile":
+# 209340
+model_small = {"subscribers_ulimit": 5.5e4, "subscribers_llimit": 3.3e4, "cv_chunks": 1,
+        "chunksize": 2e4, "table_name": "submissions_2", "outfile":
         "MODELS/sgd_svm_small.gz"}
 
-#TODO: Limit small model more
-#models = [model_small, model_med, model_large]
-models = [model_med, model_large]
+models = [model_small, model_med, model_large]
+
+f = open("log", "w")
+
+vectorizer = HashingVectorizer(
+    decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
+    alternate_sign=False, stop_words="english", norm="l1"
+)
 
 for model in models:
 
@@ -69,24 +79,22 @@ for model in models:
             engine,
         )
 
-    vectorizer = HashingVectorizer(
-        decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-        alternate_sign=False
-    )
-
-    print(f"Number of classes: {classes.shape[0]}")
+    f.write(f"Number of classes: {classes.shape[0]}\n")
+    f.flush()
 
     df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
             chunksize=chunksize)
 
     # Hold out test set (8 chunks)
-    print("Skipping test and validation sets...")
+    f.write("Skipping test and validation sets...\n")
+    f.flush()
     for i in range(cv_chunks*2):
         chunk = next(df)
 
     sgd_cv_scores = {}
     best_score = 0.
-    print("Training models...")
+    f.write("Training models...\n")
+    f.flush()
     for i, alpha in enumerate(np.logspace(-7,-3,5)):
 
         # Logistic Regression because we want probabilities; default is SVM
@@ -104,9 +112,10 @@ for model in models:
         for chunk in df:
 
             j += chunk.shape[0]
-            print(j)
+            f.write(f"{j}\n")
+            f.flush()
 
-            X_train, y_train = parse_data_chunk(chunk)
+            X_train, y_train = parse_data_chunk(chunk, vectorizer)
 
             sgd_cv.partial_fit(X_train, y_train, classes)
 
@@ -123,14 +132,15 @@ for model in models:
             del chunk
 
         # Validation set scoring
-        print("Calculating validation score...")
+        f.write("Calculating validation score...\n")
+        f.flush()
         sgd_cv_scores[alpha] = []
         score_avg = 0.
         for chunk in range(cv_chunks):
 
             chunk = next(df)
 
-            X_val, y_val = parse_data_chunk(chunk)
+            X_val, y_val = parse_data_chunk(chunk, vectorizer)
 
             score = sgd_cv.score(X_val, y_val)
             if score > best_score:
@@ -145,19 +155,20 @@ for model in models:
 
         score_avg /= cv_chunks
 
-        print(f"alpha = {alpha}")
-        print(f"val score = {score_avg}")
+        f.write(f"alpha = {alpha}\n")
+        f.write(f"val score = {score_avg}\n")
+        f.flush()
 
-    print(f"best alpha = {best_alpha}")
-    print(f"best val score= {best_score}")
-
-    dump(sgd_cv_scores, "sgd_cv_scores")
+    f.write(f"best alpha = {best_alpha}\n")
+    f.write(f"best val score= {best_score}\n")
+    f.flush()
 
     del sgd_cv
     del sgd_cv_scores
 
     ############## Training set (including validation set)
-    print("Performing training on entire training set...")
+    f.write("Performing training on entire training set...\n")
+    f.flush()
 
     df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
@@ -165,41 +176,29 @@ for model in models:
     sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
 
     # Skip test set
-    for i in range(cv_chunks):
-        chunk = next(df)
+    chunk = next(df)
+    X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
+    f.write(f"N  Train Score  Test Score\n")
+    f.flush()
     i = 0
     for chunk in df:
         i += chunk.shape[0]
-        print(i)
-        X_train, y_train = parse_data_chunk(chunk)
+        X_train, y_train = parse_data_chunk(chunk, vectorizer)
         sgd_train.partial_fit(X_train, y_train, classes)
+        train_score = sgd_train.score(X_train, y_train)
+        test_score = sgd_train.score(X_test, y_test)
+        f.write(f"{i} {train_score} {test_score}\n")
+        f.flush()
         del X_train
         del y_train
 
-    df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
-            chunksize=chunksize)
-
-    print("Getting average test score...")
-    score_avg = 0.
-    for i in range(cv_chunks):
-
-        chunk = next(df)
-        X_test, y_test = parse_data_chunk(chunk)
-        score = sgd_train.score(X_test, y_test)
-
-        del X_test
-        del y_test
-
-        score_avg += score
-
-    score_avg /= cv_chunks
-    print(f"test score = {score_avg}")
     del sgd_train
 
     ############## Entire data set
     sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
-    print("Performing training on entire data set...")
+    f.write("Performing training on entire data set...\n")
+    f.flush()
 
     df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
@@ -208,9 +207,10 @@ for model in models:
     for chunk in df:
 
         j += chunk.shape[0]
-        print(j)
+        f.write(f"{j}\n")
+        f.flush()
 
-        X, y = parse_data_chunk(chunk)
+        X, y = parse_data_chunk(chunk, vectorizer)
 
         sgd.partial_fit(X, y, classes)
 
@@ -220,4 +220,5 @@ for model in models:
     # Save the model!
     dump(sgd, outfile)
 
-    engine.dispose()
+engine.dispose()
+f.close()
