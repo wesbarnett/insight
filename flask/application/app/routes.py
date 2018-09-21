@@ -12,9 +12,9 @@ vectorizer = HashingVectorizer(
     alternate_sign=False
 )
 
-#wwwdir = "/var/www/apache-flask/application"
+wwwdir = "/var/www/apache-flask/application"
 # TODO: Remove when done testing locally
-wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
+#wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application'
 clf = load(wwwdir + "/sgd.gz")
 
 @app.route("/")
