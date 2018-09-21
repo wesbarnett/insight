@@ -1,6 +1,6 @@
 {
 	"name": "Reddit Content Classification",
-	"version": "0.1",
+	"version": "0.1.2",
     "author": "Wes Barnett",
     "homepage_url": "https://github.com/wesbarnett/insight",
 	"description": "I'll suggest communities to submit your content to.",

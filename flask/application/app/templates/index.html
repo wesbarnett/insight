@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Reddit Content Classification - Google Chrome Extension</h1>
-    <button onclick="chrome.webstore.install()" id="install-button">Add to Chrome</button>
+    <h1>Content Classification for Reddit</h1>
+    <a href="https://chrome.google.com/webstore/detail/reddit-content-classifica/iaepjdnahmaliipimelmheobbdeplhah"><img src="{{url_for('static', filename='chromebadge.png')}}" /></a>
+
 {% endblock %}

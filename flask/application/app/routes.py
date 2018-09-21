@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, url_for
 from joblib import load
 import nlp_scripts
 from sklearn.feature_extraction.text import HashingVectorizer
@@ -20,7 +20,9 @@ clf = load(wwwdir + "/sgd.gz")
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html", page="index")
+    page = {}
+    page['title'] = 'Content Classification for Reddit'
+    return render_template("index.html", page=page)
 
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
 def add_message(uuid):
