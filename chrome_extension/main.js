@@ -27,7 +27,7 @@ function handler() {
 }
 
 // Create a link with a specific ID that will be clicked
-$('span:contains("choose where to post")').append('<p><a href="javascript:void(0);" id="insightlink">give me suggestions</a><div id="loadingDiv" class="error">loading...</div><div id="insightsuggestions"></div></p>');
+$('span:contains("choose where to post")').append('<div style="border: 2px solid red; border-radius: 5px; padding: 5px;"><p><a href="javascript:void(0);" id="insightlink">give me suggestions</a><div id="loadingDiv" class="error">loading...</div><div id="insightsuggestions"></div></p></div>');
 
 $('#loadingDiv').hide();
 
