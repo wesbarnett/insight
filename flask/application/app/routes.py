@@ -28,10 +28,11 @@ vectorizer = HashingVectorizer(
     norm="l1", alternate_sign=False
 )
 
-clf = []
-clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
-clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_med.gz'))
-clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_small.gz'))
+#clf = []
+#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
+#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
+#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_med.gz'))
+clf = load(wwwdir + 'MODELS/sgd_log_small.gz')
 
 #clf = load(wwwdir + "sgd.gz")
 
@@ -62,14 +63,14 @@ def add_message(uuid):
     X = vectorizer.transform([X])
 
     # Logistic Regression; TODO: remove
-    #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-    #sorted_classes = clf.classes_[argsorted_probs]
-    #selected_predictions = list(sorted_classes[:3])
+    argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+    sorted_classes = clf.classes_[argsorted_probs]
+    selected_predictions = list(sorted_classes[:3])
 
     # SVM; TODO: use decision function to rank multiple per model
-    selected_predctions = []
-    for i in clf:
-        selected_predctions.append(i.predict(X))
+    #selected_predctions = []
+    #for i in clf:
+    #    selected_predctions.append(i.predict(X))
 
     return jsonify(selected_predictions)
 
@@ -88,14 +89,14 @@ def already_posted(uuid):
         X = vectorizer.transform([X])
 
         # Logistic Regression; TODO: remove
-        #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-        #sorted_classes = clf.classes_[argsorted_probs]
-        #selected_predictions = list(sorted_classes[:3])
+        argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+        sorted_classes = clf.classes_[argsorted_probs]
+        selected_predictions = list(sorted_classes[:3])
 
         # SVM; TODO: use decision function to rank multiple per model
-        selected_predctions = []
-        for i in clf:
-            selected_predctions.append(i.predict(X))
+        #selected_predctions = []
+        #for i in clf:
+        #    selected_predctions.append(i.predict(X))
 
         return jsonify(selected_predictions)
 
