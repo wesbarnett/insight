@@ -1,9 +1,9 @@
 {
-	"name": "Reddit Content Classification",
-	"version": "0.1.2",
+	"name": "Subreddits with Content Like This",
+	"version": "0.1.3",
     "author": "Wes Barnett",
-    "homepage_url": "https://github.com/wesbarnett/insight",
-	"description": "I'll suggest communities to submit your content to.",
+    "homepage_url": "https://insight.barnett.science",
+	"description": "Tags Reddit posts and submitted content with subreddits that have similar content so that users can discover new communities.",
 	"manifest_version": 2,
     "content_scripts": [ {
         "js": ["thirdParty/jquery-3.3.1.min.js", "main.js"],

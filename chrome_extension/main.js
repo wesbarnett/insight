@@ -51,9 +51,9 @@ $('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;"
 $.ajax
 ({
     type: "POST",
-	//url: "https://insight.barnett.science/api/already_posted/1234",
+	url: "https://insight.barnett.science/api/already_posted/1234",
     // TODO: remove following after done with local testing
-	url: "http://localhost:8080/api/already_posted/1234",
+	//url: "http://localhost:8080/api/already_posted/1234",
 	dataType: "json",
 	data: JSON.stringify({ "url": window.location.href}),
 	contentType: "application/json",
