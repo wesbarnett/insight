@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Content Classification for Reddit</h1>
-    <a href="https://chrome.google.com/webstore/detail/reddit-content-classifica/iaepjdnahmaliipimelmheobbdeplhah"><img src="{{url_for('static', filename='chromebadge.png')}}" /></a>
+<h1>Subreddits with Content Like This</h1>
+
+<p>Reddit wants users to engage with smaller, less-known communities, and users want to
+discover new content and communities. Even though Reddit continues to roll out new
+features to help users discover new subreddits, it's still a difficult task for the
+user. There are almost 1 million subreddits!</p>
+
+<p>To help users find new communities, I've developed this Chrome extension. Once
+installed will add a new section under posts on Reddit notifying the user of subreddits
+that contain content similar to the post they are viewing.</p>
+
+<p><a href="https://chrome.google.com/webstore/detail/reddit-content-classifica/iaepjdnahmaliipimelmheobbdeplhah"><img src="{{url_for('static', filename='chromebadge.png')}}" /></a></p>
 
 {% endblock %}
