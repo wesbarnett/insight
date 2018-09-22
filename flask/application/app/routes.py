@@ -43,7 +43,7 @@ def index():
     extension.
     """
     page = {}
-    page['title'] = 'Content Classification for Reddit'
+    page['title'] = 'Subreddits with Content Like This'
     return render_template("index.html", page=page)
 
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
