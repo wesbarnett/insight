@@ -27,17 +27,20 @@ def parse_data_chunk(chunk, vectorizer):
 # 711014
 model_large = {"subscribers_ulimit": None, "subscribers_llimit": 1.3e5, "cv_chunks": 1,
         "chunksize": 7e4, "table_name": "submissions_0", "outfile":
-        "MODELS/sgd_svm_large.gz"}
+        "MODELS/sgd_svm_large.gz", "train_outfile": "MODELS/sgd_svm_train_large.gz"
+        }
 
 # 452885
 model_med = {"subscribers_ulimit": 1.3e5, "subscribers_llimit": 5.5e4, "cv_chunks": 1,
         "chunksize": 4e4, "table_name": "submissions_1", "outfile":
-        "MODELS/sgd_svm_med.gz"}
+        "MODELS/sgd_svm_med.gz", "train_outfile": "MODELS/sgd_svm_train_med.gz"
+        }
 
 # 209340
 model_small = {"subscribers_ulimit": 5.5e4, "subscribers_llimit": 3.3e4, "cv_chunks": 1,
         "chunksize": 2e4, "table_name": "submissions_2", "outfile":
-        "MODELS/sgd_svm_small.gz"}
+        "MODELS/sgd_svm_small.gz", "train_outfile": "MODELS/sgd_svm_train_small.gz"
+        }
 
 models = [model_small, model_med, model_large]
 
@@ -48,6 +51,8 @@ vectorizer = HashingVectorizer(
     alternate_sign=False, stop_words="english", norm="l1"
 )
 
+engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
+
 for model in models:
 
     subscribers_ulimit = model["subscribers_ulimit"]
@@ -56,12 +61,10 @@ for model in models:
     chunksize = model["chunksize"]
     table_name = model["table_name"]
     outfile = model["outfile"]
+    train_outfile = model["train_outfile"]
 
     # For test set and validation set
     limit = chunksize*cv_chunks*2
-
-    # Select only subreddits with minimum number of submissions
-    engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
 
     if subscribers_ulimit == None:
         classes = pd.read_sql(
@@ -193,6 +196,7 @@ for model in models:
         del X_train
         del y_train
 
+    dump(sgd_train, train_outfile)
     del sgd_train
 
     ############## Entire data set
@@ -219,6 +223,8 @@ for model in models:
 
     # Save the model!
     dump(sgd, outfile)
+    del sgd
 
 engine.dispose()
+
 f.close()
