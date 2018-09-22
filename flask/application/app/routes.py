@@ -9,10 +9,14 @@ from sklearn.feature_extraction.text import HashingVectorizer
 # threshold?
 
 # exegete_
-client_id='9KcLHx1mFlKnNg'
-client_secret='DQyXB6RGOt86FK_aLBcRkIA7-fA'
-refresh_token='62862724-RO4X84RAN8UZCmwGpUMtaL5_Btk'
-user_agent='content classification v 0.1 by /u/exegete_'
+#wwwdir = "/var/www/apache-flask/application/app/"
+wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
+
+with open(wwwdir + 'config.in') as f:
+    client_id=f.readline().strip('\n')
+    client_secret=f.readline().strip('\n')
+    refresh_token=f.readline().strip('\n')
+    user_agent=f.readline().strip('\n')
 
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=client_secret,
@@ -25,8 +29,6 @@ vectorizer = HashingVectorizer(
     alternate_sign=False
 )
 
-#wwwdir = "/var/www/apache-flask/application/app/"
-wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
 clf = load(wwwdir + "sgd.gz")
 
 @app.route("/")
