@@ -2,17 +2,31 @@ from app import app
 from flask import Flask, request, jsonify, render_template, url_for
 from joblib import load
 import nlp_scripts
+import praw
 from sklearn.feature_extraction.text import HashingVectorizer
 
 # TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
 # threshold?
 
+# exegete_
+client_id='9KcLHx1mFlKnNg'
+client_secret='DQyXB6RGOt86FK_aLBcRkIA7-fA'
+refresh_token='62862724-RO4X84RAN8UZCmwGpUMtaL5_Btk'
+user_agent='content classification v 0.1 by /u/exegete_'
+
+reddit = praw.Reddit(client_id=client_id,
+                     client_secret=client_secret,
+                     refresh_token=refresh_token,
+                     user_agent=user_agent)
+
+print(reddit.user.me())
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2 ** 18,
     alternate_sign=False
 )
 
-wwwdir = "/var/www/apache-flask/application/app/"
+#wwwdir = "/var/www/apache-flask/application/app/"
+wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
 clf = load(wwwdir + "sgd.gz")
 
 @app.route("/")
@@ -46,6 +60,30 @@ def add_message(uuid):
     selected_predictions = list(sorted_classes[:3])
 
     return jsonify(selected_predictions)
+
+@app.route("/api/already_posted/<uuid>", methods=["GET", "POST"])
+def already_posted(uuid):
+    content = request.json
+    print(content)
+
+    if "/comments/" in content["url"]:
+
+        submission = praw.models.Submission(reddit, url=content["url"])
+
+        title = submission.title
+        text = submission.selftext
+        X = title + " " + text
+        X = vectorizer.transform([X])
+
+        argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+        sorted_classes = clf.classes_[argsorted_probs]
+        selected_predictions = list(sorted_classes[:3])
+
+        return jsonify(selected_predictions)
+
+    else:
+
+        return ""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
