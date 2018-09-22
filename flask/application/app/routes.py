@@ -8,9 +8,8 @@ from sklearn.feature_extraction.text import HashingVectorizer
 # TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
 # threshold?
 
-# exegete_
-#wwwdir = "/var/www/apache-flask/application/app/"
-wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
+wwwdir = "/var/www/apache-flask/application/app/"
+#wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
 
 with open(wwwdir + 'config.in') as f:
     client_id=f.readline().strip('\n')
