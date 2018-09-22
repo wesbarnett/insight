@@ -26,10 +26,15 @@ reddit = praw.Reddit(client_id=client_id,
 print(reddit.user.me())
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2 ** 18,
-    alternate_sign=False
+    norm="l1", alternate_sign=False
 )
 
-clf = load(wwwdir + "sgd.gz")
+clf = []
+clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
+clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_med.gz'))
+clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_small.gz'))
+
+#clf = load(wwwdir + "sgd.gz")
 
 @app.route("/")
 @app.route("/index")
@@ -57,9 +62,15 @@ def add_message(uuid):
     X = title + " " + text
     X = vectorizer.transform([X])
 
-    argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-    sorted_classes = clf.classes_[argsorted_probs]
-    selected_predictions = list(sorted_classes[:3])
+    # Logistic Regression; TODO: remove
+    #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+    #sorted_classes = clf.classes_[argsorted_probs]
+    #selected_predictions = list(sorted_classes[:3])
+
+    # SVM; TODO: use decision function to rank multiple per model
+    selected_predctions = []
+    for i in clf:
+        selected_predctions.append(i.predict(X))
 
     return jsonify(selected_predictions)
 
@@ -77,12 +88,19 @@ def already_posted(uuid):
         X = title + " " + text
         X = vectorizer.transform([X])
 
-        argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-        sorted_classes = clf.classes_[argsorted_probs]
-        selected_predictions = list(sorted_classes[:3])
+        # Logistic Regression; TODO: remove
+        #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+        #sorted_classes = clf.classes_[argsorted_probs]
+        #selected_predictions = list(sorted_classes[:3])
+
+        # SVM; TODO: use decision function to rank multiple per model
+        selected_predctions = []
+        for i in clf:
+            selected_predctions.append(i.predict(X))
 
         return jsonify(selected_predictions)
 
+    # TODO: handle this better
     else:
 
         return ""
