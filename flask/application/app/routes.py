@@ -29,10 +29,9 @@ vectorizer = HashingVectorizer(
     norm="l1", alternate_sign=False
 )
 
-clf = []
-clf.append(load(wwwdir + 'MODELS/sgd_svm_large_sparse.gz'))
-clf.append(load(wwwdir + 'MODELS/sgd_svm_med_sparse.gz'))
-clf.append(load(wwwdir + 'MODELS/sgd_svm_small_sparse.gz'))
+clf = [load(wwwdir + 'MODELS/sgd_svm_large.gz'),
+    load(wwwdir + 'MODELS/sgd_svm_med.gz'),
+    load(wwwdir + 'MODELS/sgd_svm_small.gz')]
 
 @app.route("/")
 @app.route("/index")
