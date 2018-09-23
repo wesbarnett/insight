@@ -96,8 +96,8 @@ $(document)
 $('#title-field').find('textarea[name="title"]').bindWithDelay("keydown", handler, 100);
 $('#text-field').find('textarea[name="text"]').bindWithDelay("keydown", handler, 100);
 
-// For submissions pages
-$('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;">loading...</div>');
+// For pages with posts - TODO
+//$('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;">loading...</div>');
 
 //  $.ajax
 //  ({
