@@ -81,7 +81,7 @@ function handler() {
 }
 
 // Currently only works on subreddits that take self text posts
-$('.bottom-area:first').parent().append('<h3>communities with content like this</h3><div id="loadingDiv" class="error">loading...</div><div id="insightsuggestions">start typing above!</div>');
+$('.bottom-area:first').parent().append('<div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div>');
 
 $('#loadingDiv').hide();
 
