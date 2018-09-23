@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, render_template, url_for
 from joblib import load
 import nlp_scripts
 import praw
+import sklearn
 from sklearn.feature_extraction.text import HashingVectorizer
 
 # TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
@@ -28,13 +29,10 @@ vectorizer = HashingVectorizer(
     norm="l1", alternate_sign=False
 )
 
-#clf = []
-#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
-#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_large.gz'))
-#clf.append(load(wwwdir + 'MODELS_L1_NORM/sgd_svm_med.gz'))
-clf = load(wwwdir + 'MODELS/sgd_log_small.gz')
-
-#clf = load(wwwdir + "sgd.gz")
+clf = []
+clf.append(load(wwwdir + 'MODELS/sgd_svm_large_sparse.gz'))
+clf.append(load(wwwdir + 'MODELS/sgd_svm_med_sparse.gz'))
+clf.append(load(wwwdir + 'MODELS/sgd_svm_small_sparse.gz'))
 
 @app.route("/")
 @app.route("/index")
@@ -63,14 +61,17 @@ def add_message(uuid):
     X = vectorizer.transform([X])
 
     # Logistic Regression; TODO: remove
-    argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-    sorted_classes = clf.classes_[argsorted_probs]
-    selected_predictions = list(sorted_classes[:3])
+    #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+    #sorted_classes = clf.classes_[argsorted_probs]
+    #selected_predictions = list(sorted_classes[:3])
 
     # SVM; TODO: use decision function to rank multiple per model
-    #selected_predctions = []
-    #for i in clf:
-    #    selected_predctions.append(i.predict(X))
+    selected_predictions = []
+    for i in clf:
+        with sklearn.config_context(assume_finite=True):
+            p = i.predict(X)[0]
+        print(p)
+        selected_predictions.append(p)
 
     return jsonify(selected_predictions)
 
@@ -89,14 +90,17 @@ def already_posted(uuid):
         X = vectorizer.transform([X])
 
         # Logistic Regression; TODO: remove
-        argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-        sorted_classes = clf.classes_[argsorted_probs]
-        selected_predictions = list(sorted_classes[:3])
+        #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
+        #sorted_classes = clf.classes_[argsorted_probs]
+        #selected_predictions = list(sorted_classes[:3])
 
         # SVM; TODO: use decision function to rank multiple per model
-        #selected_predctions = []
-        #for i in clf:
-        #    selected_predctions.append(i.predict(X))
+        selected_predictions = []
+        for i in clf:
+            with sklearn.config_context(assume_finite=True):
+                p = i.predict(X)[0]
+            print(p)
+            selected_predictions.append(p)
 
         return jsonify(selected_predictions)
 
