@@ -86,10 +86,6 @@ $('.bottom-area:first').parent().append('<div style="font-size: large;">communit
 $('#loadingDiv').hide();
 
 $(document)
-    // Waits for link with ID to be clicked
-    .ready(function() {
-        $("#insightlink").click(handler);
-    })
     .ajaxStart(function () {
         $("#loadingDiv").show();
     })
