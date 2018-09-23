@@ -81,15 +81,11 @@ function handler() {
 }
 
 // Currently only works on subreddits that take self text posts
-$('.bottom-area:first').parent().append('<h3>communities with content like this</h3><div id="loadingDiv" class="error">loading...</div><div id="insightsuggestions">start typing above!</div>');
+$('.bottom-area:first').parent().append('<div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div>');
 
 $('#loadingDiv').hide();
 
 $(document)
-    // Waits for link with ID to be clicked
-    .ready(function() {
-        $("#insightlink").click(handler);
-    })
     .ajaxStart(function () {
         $("#loadingDiv").show();
     })
@@ -100,8 +96,8 @@ $(document)
 $('#title-field').find('textarea[name="title"]').bindWithDelay("keydown", handler, 100);
 $('#text-field').find('textarea[name="text"]').bindWithDelay("keydown", handler, 100);
 
-// For submissions pages
-$('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;">loading...</div>');
+// For pages with posts - TODO
+//$('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;">loading...</div>');
 
 //  $.ajax
 //  ({

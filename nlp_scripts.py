@@ -6,9 +6,10 @@ from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 
 def process_text(txt):
-    """Processes text in preparation for word stemming. Removes line breaks and tabs,
-    and converts numbers, urls, email addresses, and dollar signs into symbolic
-    characters.
+    """Processes text in preparation for word stemming. Specifically it makes all
+    letters lowercase, removes line breaks and tabs, and converts numbers, urls, email
+    addresses, and dollar signs into symbolic characters. Removes additional
+    punctuation.
     
     Parameters
     ----------
@@ -16,6 +17,8 @@ def process_text(txt):
         The text to be processed.
     """
 
+    # Make text all lowercase, remove line breaks and tabs
+    txt = txt.lower()
     txt = sub("\n", " ", txt)
     txt = sub("\t", " ", txt)
 
@@ -24,6 +27,10 @@ def process_text(txt):
     txt = sub("(http|https)://[^\s]*", "httpaddr", txt)
     txt = sub("[^\s]+@[^\s]+", "emailaddr", txt)
     txt = sub("[$]+", "dollar", txt)
+
+    # Remove additional punctuation
+    table = str.maketrans({key: None for key in punctuation})
+    txt = txt.translate(table)
 
     return txt
 
