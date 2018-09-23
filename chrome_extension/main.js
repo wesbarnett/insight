@@ -80,45 +80,47 @@ function handler() {
 	});
 }
 
-// Currently only works on subreddits that take self text posts
-$('.bottom-area:first').parent().append('<div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div>');
+var string = window.location.href,
+substring0 = "submit";
+substring1 = "comments";
+if (string.indexOf(substring0) !== -1) {
 
-$('#loadingDiv').hide();
+    // Currently only works on subreddits that take self text posts
+    $('.bottom-area:first').parent().append('<div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div>');
 
-$(document)
-    .ajaxStart(function () {
-        $("#loadingDiv").show();
-    })
-    .ajaxStop(function () {
-        $("#loadingDiv").hide();
+    $('#loadingDiv').hide();
+
+    $(document)
+        .ajaxStart(function () {
+            $("#loadingDiv").show();
+        })
+        .ajaxStop(function () {
+            $("#loadingDiv").hide();
+        });
+
+    $('#title-field').find('textarea[name="title"]').bindWithDelay("keydown", handler, 100);
+    $('#text-field').find('textarea[name="text"]').bindWithDelay("keydown", handler, 100);
+
+} else if (string.indexOf(substring1) !== -1) {
+
+    $('.flat-list:eq(3)').append('<div style="font-size: large;" id="insightsuggestions">communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div>');
+    $.ajax
+    ({
+        type: "POST",
+        url: "https://insight.barnett.science/api/already_posted/1234",
+        dataType: "json",
+        data: JSON.stringify({ "url": window.location.href}),
+        contentType: "application/json",
+        success: function (result) {
+            if (result != "") {
+                $('#insightsuggestions').html('<div style="font-size: large;">communities with content like this</div>');
+                for (var i = 0; i < result.length; i++) {
+                    $('#insightsuggestions').append('<a style="font-size: small;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
+        }
     });
-
-$('#title-field').find('textarea[name="title"]').bindWithDelay("keydown", handler, 100);
-$('#text-field').find('textarea[name="text"]').bindWithDelay("keydown", handler, 100);
-
-// For pages with posts - TODO
-//$('.entry:eq(0)').append('<div id="insightsuggestions" style="font-size: large;">loading...</div>');
-
-//  $.ajax
-//  ({
-//      type: "POST",
-//      url: "https://insight.barnett.science/api/already_posted/1234",
-//      // TODO: remove following after done with local testing
-//      //url: "http://localhost:8080/api/already_posted/1234",
-//      dataType: "json",
-//      data: JSON.stringify({ "url": window.location.href}),
-//      contentType: "application/json",
-//      success: function (result) {
-//          if (result != "") {
-//              // TODO: Make this a link the user can click and then populate the "choose
-//              // where to post" field or add link to subscribe.
-//              $('#insightsuggestions').html('<h3>communities with similar content:</h3>');
-//              for (var i = 0; i < result.length; i++) {
-//                  $('#insightsuggestions').append('<a style="font-size: large;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
-//              }
-//          }
-//      },
-//      error: function(xhr, status, error) {
-//          $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
-//      }
-//  });
+}
