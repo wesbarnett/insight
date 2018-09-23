@@ -6,11 +6,7 @@ import praw
 import sklearn
 from sklearn.feature_extraction.text import HashingVectorizer
 
-# TODO:Right now suggests three subreddits. Should we make this more dynamic (based on some
-# threshold?
-
 wwwdir = "/var/www/apache-flask/application/app/"
-#wwwdir = '/home/wes/Documents/data-science/insight/PROJECT/flask/application/'
 
 with open(wwwdir + 'config.in') as f:
     client_id=f.readline().strip('\n')
@@ -48,8 +44,8 @@ def index():
 def add_message(uuid):
     """
     This route will be accessed remotely from the Chrome extension. It takes the user
-    input (which is the Reddit submission's title and text and runs a prediction on it
-    based on our previously trained model. Then it returns the results back to the
+    input (which is the Reddit submission's title and text) and returns the top 3
+    predicted subreddits for each model. Then it returns the results back to the
     extension so it can display them.
     """
     content = request.json
@@ -59,21 +55,16 @@ def add_message(uuid):
     X = title + " " + text
     X = vectorizer.transform([X])
 
-    # Logistic Regression; TODO: remove
-    #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-    #sorted_classes = clf.classes_[argsorted_probs]
-    #selected_predictions = list(sorted_classes[:3])
-
-    # SVM; TODO: use decision function to rank multiple per model
     selected_predictions = []
     for i in clf:
         with sklearn.config_context(assume_finite=True):
-            p = i.predict(X)[0]
-        print(p)
-        selected_predictions.append(p)
+            argsorted_dec = i.decision_function(X).argsort()[0][::-1]
+            sorted_classes = i.classes_[argsorted_dec]
+        selected_predictions += list(sorted_classes[:3])
 
     return jsonify(selected_predictions)
 
+# TODO: Either remove or update
 @app.route("/api/already_posted/<uuid>", methods=["GET", "POST"])
 def already_posted(uuid):
     content = request.json
