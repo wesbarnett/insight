@@ -64,40 +64,26 @@ def add_message(uuid):
 
     return jsonify(selected_predictions)
 
-# TODO: Either remove or update
 @app.route("/api/already_posted/<uuid>", methods=["GET", "POST"])
 def already_posted(uuid):
     content = request.json
     print(content)
 
-    if "/comments/" in content["url"]:
+    submission = praw.models.Submission(reddit, url=content["url"])
 
-        submission = praw.models.Submission(reddit, url=content["url"])
+    title = submission.title
+    text = submission.selftext
+    X = title + " " + text
+    X = vectorizer.transform([X])
 
-        title = submission.title
-        text = submission.selftext
-        X = title + " " + text
-        X = vectorizer.transform([X])
+    selected_predictions = []
+    for i in clf:
+        with sklearn.config_context(assume_finite=True):
+            argsorted_dec = i.decision_function(X).argsort()[0][::-1]
+            sorted_classes = i.classes_[argsorted_dec]
+        selected_predictions += list(sorted_classes[:3])
 
-        # Logistic Regression; TODO: remove
-        #argsorted_probs = clf.predict_proba(X).argsort()[0][::-1]
-        #sorted_classes = clf.classes_[argsorted_probs]
-        #selected_predictions = list(sorted_classes[:3])
-
-        # SVM; TODO: use decision function to rank multiple per model
-        selected_predictions = []
-        for i in clf:
-            with sklearn.config_context(assume_finite=True):
-                p = i.predict(X)[0]
-            print(p)
-            selected_predictions.append(p)
-
-        return jsonify(selected_predictions)
-
-    # TODO: handle this better
-    else:
-
-        return ""
+    return jsonify(selected_predictions)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
