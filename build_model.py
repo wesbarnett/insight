@@ -222,7 +222,7 @@ for model in models:
         del y
 
     # Save the model!
-    dump(sgd, outfile)
+    dump(sgd.sparsify(), outfile)
     del sgd
 
 engine.dispose()
