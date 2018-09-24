@@ -4,9 +4,13 @@
     "author": "Wes Barnett",
     "homepage_url": "https://insight.barnett.science",
 	"description": "Tags Reddit posts and submitted content with subreddits that have similar content so that users can discover new communities.",
+    "options_page": "options.html",
 	"manifest_version": 2,
     "content_scripts": [ {
         "js": ["thirdParty/jquery-3.3.1.min.js", "thirdParty/bindWithDelay.js", "main.js"],
         "matches": [ "https://*.reddit.com/*" ]
-    } ]
+    } ],
+	"permissions": [
+    	"storage"
+	]
 }
