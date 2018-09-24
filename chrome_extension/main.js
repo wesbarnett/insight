@@ -26,10 +26,23 @@ function handler() {
 	});
 }
 
-chrome.storage.sync.get(['newSubmissionsCheckmark', 'alreadySubmittedCheckmark'], function(result) {
+chrome.storage.sync.clear();
+chrome.storage.sync.get(['newSubmissionsCheckmark', 'alreadySubmittedCheckmark', 'keyupDelayValue'], function(result) {
 
     doNewSubmissions = result.newSubmissionsCheckmark;
     doOldSubmissions = result.alreadySubmittedCheckmark;
+    keyupDelay = result.keyupDelayValue;
+
+    // Defaults
+    if (doNewSubmissions == undefined) { 
+        doNewSubmissions = true; 
+    }
+    if (doOldSubmissions == undefined) { 
+        doOldSubmissions = true; 
+    }
+    if (keyupDelay == undefined) { 
+        keyupDelay = 100;
+    }
 
     var string = window.location.href,
     substring0 = "submit";
@@ -49,8 +62,8 @@ chrome.storage.sync.get(['newSubmissionsCheckmark', 'alreadySubmittedCheckmark']
                 $("#loadingDiv").hide();
             });
 
-        $('#title-field').find('textarea[name="title"]').bindWithDelay("keydown", handler, 100);
-        $('#text-field').find('textarea[name="text"]').bindWithDelay("keydown", handler, 100);
+        $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, keyupDelay);
+        $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, keyupDelay);
 
     } else if (string.indexOf(substring1) !== -1 && doOldSubmissions) {
 
