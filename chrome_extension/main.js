@@ -4,26 +4,35 @@
 function handler() {
 	var title = $('#title-field').find('textarea[name="title"]').val();
 	var text = $('#text-field').find('textarea[name="text"]').val();
-	$.ajax
-	({
-		type: "POST",
-		url: "https://insight.barnett.science/api/add_message/1234",
-		dataType: "json",
-		data: JSON.stringify({ "title": title, "text" : text}),
-		contentType: "application/json",
-		success: function (result) {
-            // TODO: Make this a link the user can click and then populate the "choose
-            // where to post" field or add link to subscribe.
-            $('#insightsuggestions').html(" ");
-            for (var i = 0; i < result.length; i++) {
-                $('#insightsuggestions').append('<a style="font-size: small;" href="#" class="sr-suggestion" tabindex="100">' + result[i] + '</a> ');
+    if ((title) || (text) ){
+        $.ajax
+        ({
+            type: "POST",
+            url: "https://insight.barnett.science/api/add_message/1234",
+            dataType: "json",
+            data: JSON.stringify({ "title": title, "text" : text}),
+            contentType: "application/json",
+            success: function (result) {
+                // TODO: Make this a link the user can click and then populate the "choose
+                // where to post" field or add link to subscribe.
+                $('#insightsuggestions').html(" ");
+                for (var i = 0; i < result.length; i++) {
+                    $('#insightsuggestions').append('<a style="font-size: small;" href="#" class="sr-suggestion" tabindex="100">' + result[i] + '</a> ');
+                }
+                $('#insightlink').html('');
+            },
+            error: function(xhr, status, error) {
+                $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
             }
-            $('#insightlink').html('');
-		},
-        error: function(xhr, status, error) {
-            $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
-        }
-	});
+        });
+    }
+    else {
+        $('#insightsuggestions').html('start typing above!');
+    }
+}
+
+if (window.location.hostname == "www.reddit.com") {
+    window.location.replace("https://old.reddit.com" + location.href.split(location.host)[1]);
 }
 
 chrome.storage.sync.clear();
