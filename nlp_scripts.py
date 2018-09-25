@@ -2,9 +2,9 @@
 
 from re import sub
 from string import punctuation
-from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.porter import PorterStemmer
 from nltk import word_tokenize
-from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
 
 def process_text(txt):
     """Processes text in preparation for word stemming. Specifically it makes all
@@ -47,7 +47,6 @@ def stemmed_words(doc):
         The text that will be processed and with words that will be stemmed.
     """
     doc = process_text(doc)
-    stemmer = SnowballStemmer('english')
+    stemmer = PorterStemmer()
     tokens = word_tokenize(doc)
-    stop = set(stopwords.words('english'))
-    return (stemmer.stem(w) for w in tokens if w not in stop)
+    return (stemmer.stem(w) for w in tokens)

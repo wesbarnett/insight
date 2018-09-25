@@ -9,8 +9,11 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import f1_score
+from datetime import date, time
 import sqlalchemy
 import sql_scripts
+import time
+time.ctime()
 
 def parse_data_chunk(chunk, vectorizer):
     X = chunk["title"] + " " + chunk["selftext"]
@@ -43,12 +46,14 @@ model_small = {"subscribers_ulimit": 5.5e4, "subscribers_llimit": 3.3e4, "cv_chu
 
 models = [model_small, model_med, model_large]
 
-f = open("log", "w")
+f = open("log", "a")
+f.write('\n')
+f.write(time.ctime())
+f.write('\n')
 
-# Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-    alternate_sign=False, norm="l1"
+    alternate_sign=False, norm="l1", stop_words="english"
 )
 
 engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
@@ -96,6 +101,7 @@ for model in models:
         # Skip hold out test set and validation set
         for i in range(cv_chunks*2):
             chunk = next(df)
+            print(chunk.iloc[0])
             del chunk
 
         j = 0
@@ -168,6 +174,7 @@ for model in models:
 
     # Skip test set
     chunk = next(df)
+    print(chunk.iloc[0])
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
     f.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
