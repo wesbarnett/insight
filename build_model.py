@@ -1,7 +1,5 @@
 # Parameter selection using cross-validation
 
-# TODO: Learning curves?
-
 import nlp_scripts
 import numpy as np
 import pandas as pd
@@ -10,6 +8,7 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import f1_score
 import sqlalchemy
 import sql_scripts
 
@@ -46,9 +45,10 @@ models = [model_small, model_med, model_large]
 
 f = open("log", "w")
 
+# Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-    alternate_sign=False, stop_words="english", norm="l1"
+    alternate_sign=False, norm="l1"
 )
 
 engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
@@ -62,9 +62,6 @@ for model in models:
     table_name = model["table_name"]
     outfile = model["outfile"]
     train_outfile = model["train_outfile"]
-
-    # For test set and validation set
-    limit = chunksize*cv_chunks*2
 
     if subscribers_ulimit == None:
         classes = pd.read_sql(
@@ -85,23 +82,13 @@ for model in models:
     f.write(f"Number of classes: {classes.shape[0]}\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
-            chunksize=chunksize)
-
-    # Hold out test set (8 chunks)
-    f.write("Skipping test and validation sets...\n")
-    f.flush()
-    for i in range(cv_chunks*2):
-        chunk = next(df)
-
-    sgd_cv_scores = {}
     best_score = 0.
     f.write("Training models...\n")
     f.flush()
     for i, alpha in enumerate(np.logspace(-7,-3,5)):
 
-        # Logistic Regression because we want probabilities; default is SVM
-        sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+        sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+                random_state=0)
 
         df = pd.read_sql(f"select * from {table_name};", engine,
                 chunksize=chunksize)
@@ -126,7 +113,7 @@ for model in models:
             del y_train
 
         # Re-read from beginning of table
-        df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
+        df = pd.read_sql(f"select * from {table_name};", engine,
                 chunksize=chunksize)
 
         # Skip hold out test set
@@ -137,7 +124,6 @@ for model in models:
         # Validation set scoring
         f.write("Calculating validation score...\n")
         f.flush()
-        sgd_cv_scores[alpha] = []
         score_avg = 0.
         for chunk in range(cv_chunks):
 
@@ -146,6 +132,9 @@ for model in models:
             X_val, y_val = parse_data_chunk(chunk, vectorizer)
 
             score = sgd_cv.score(X_val, y_val)
+            f.write(f"accuracy = {score}\n")
+            score = f1_score(y_val, sgd_cv.predict(X_val), average='weighted')
+            f.write(f"f1 score = {score}\n")
             if score > best_score:
                 best_score = score
                 best_alpha = alpha
@@ -154,7 +143,6 @@ for model in models:
             del y_val
 
             score_avg += score
-            sgd_cv_scores[alpha].append(score)
 
         score_avg /= cv_chunks
 
@@ -167,7 +155,6 @@ for model in models:
     f.flush()
 
     del sgd_cv
-    del sgd_cv_scores
 
     ############## Training set (including validation set)
     f.write("Performing training on entire training set...\n")
@@ -176,13 +163,14 @@ for model in models:
     df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
 
-    sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+    sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+            random_state=0)
 
     # Skip test set
     chunk = next(df)
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
-    f.write(f"N  Train Score  Test Score\n")
+    f.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
     f.flush()
     i = 0
     for chunk in df:
@@ -190,17 +178,20 @@ for model in models:
         X_train, y_train = parse_data_chunk(chunk, vectorizer)
         sgd_train.partial_fit(X_train, y_train, classes)
         train_score = sgd_train.score(X_train, y_train)
+        train_f1_score = f1_score(y_train, sgd_train.predict(X_train), average='weighted')
         test_score = sgd_train.score(X_test, y_test)
-        f.write(f"{i} {train_score} {test_score}\n")
+        test_f1_score = f1_score(y_test, sgd_train.predict(X_test), average='weighted')
+        f.write(f"{i} {train_score} {test_score} {train_f1_score} {test_f1_score}\n")
         f.flush()
         del X_train
         del y_train
 
-    dump(sgd_train, train_outfile)
+    dump(sgd_train.sparsify(), train_outfile)
     del sgd_train
 
     ############## Entire data set
-    sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+    sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+            random_state=0)
     f.write("Performing training on entire data set...\n")
     f.flush()
 
