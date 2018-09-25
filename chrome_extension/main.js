@@ -58,7 +58,7 @@ substring1 = "comments";
 if (string.indexOf(substring0) !== -1) {
 
     // Currently only works on subreddits that take self text posts
-    $('.bottom-area:first').parent().parent().append('<div class="reddit-infobar"><div style="font-size: large; font-weight: bold;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
+    $('.bottom-area:first').parent().append('<div class="reddit-infobar"><div style="font-size: large; font-weight: bold;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
 
     $('#loadingDiv').hide();
 
@@ -76,7 +76,7 @@ if (string.indexOf(substring0) !== -1) {
 // ALREADY SUBMITTED ------------------------------------------------
 } else if (string.indexOf(substring1) !== -1) {
 
-    $('.flat-list:eq(3)').append('<div class="reddit-infobar"><div style="font-size: large;" id="insightsuggestions"><b>communities with content like this</b><span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
+    $('.flat-list:eq(3)').parent().append('<div class="reddit-infobar"><div style="font-size: large;" id="insightsuggestions"><b>communities with content like this</b><span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
     $.ajax
     ({
         type: "POST",
