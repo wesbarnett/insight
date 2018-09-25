@@ -44,9 +44,10 @@ models = [model_small, model_med, model_large]
 
 f = open("log", "w")
 
+# Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-    alternate_sign=False, stop_words="english", norm="l1"
+    alternate_sign=False
 )
 
 engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
