@@ -85,7 +85,9 @@ def already_posted(uuid):
         selected_predictions += list(sorted_classes[:3])
 
     # Remove prediction if it is the same subreddit you are in
-    selected_predictions.remove(subreddit)
+    # TODO?
+    #if subreddit in selected_predictions:
+    #    selected_predictions.remove(subreddit)
 
     return jsonify(selected_predictions)
 
