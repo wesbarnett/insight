@@ -48,7 +48,7 @@ f = open("log", "w")
 # Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-    alternate_sign=False, norm="l1"
+    alternate_sign=False, norm="l1", stop_words="english"
 )
 
 engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
@@ -96,6 +96,7 @@ for model in models:
         # Skip hold out test set and validation set
         for i in range(cv_chunks*2):
             chunk = next(df)
+            print(chunk.iloc[0])
             del chunk
 
         j = 0
@@ -168,6 +169,7 @@ for model in models:
 
     # Skip test set
     chunk = next(df)
+    print(chunk.iloc[0])
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
     f.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
