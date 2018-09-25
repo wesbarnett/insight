@@ -15,10 +15,19 @@ function handler() {
             success: function (result) {
                 // TODO: Make this a link the user can click and then populate the "choose
                 // where to post" field or add link to subscribe.
-                $('#insightsuggestions').html(" ");
-                for (var i = 0; i < result.length; i++) {
+                $('#insightsuggestions').html('<p style="font-size: x-small;">subscribers &gt; 130,000</p><p>')
+                for (var i = 0; i < 3; i++) {
                     $('#insightsuggestions').append('<a style="font-size: small;" href="#" class="sr-suggestion" tabindex="100">' + result[i] + '</a> ');
                 }
+                $('#insightsuggestions').append('</p><br><p style="font-size: x-small;">130,000 &gt; subscribers &gt; 55,000</p><p>')
+                for (var i = 3; i < 6; i++) {
+                    $('#insightsuggestions').append('<a style="font-size: small;" href="#" class="sr-suggestion" tabindex="100">' + result[i] + '</a> ');
+                }
+                $('#insightsuggestions').append('</p><br><p style="font-size: x-small;">55,000 &gt; subscribers &gt; 33,000</p><p>')
+                for (var i = 6; i < result.length; i++) {
+                    $('#insightsuggestions').append('<a style="font-size: small;" href="#" class="sr-suggestion" tabindex="100">' + result[i] + '</a> ');
+                }
+                $('#insightsuggestions').append("</p>")
                 $('#insightlink').html('');
             },
             error: function(xhr, status, error) {
@@ -31,71 +40,58 @@ function handler() {
     }
 }
 
-if (window.location.hostname == "www.reddit.com") {
-    window.location.replace("https://old.reddit.com" + location.href.split(location.host)[1]);
-}
+var string = window.location.href,
+substring0 = "submit";
+substring1 = "comments";
 
-chrome.storage.sync.clear();
-chrome.storage.sync.get(['newSubmissionsCheckmark', 'alreadySubmittedCheckmark', 'keyupDelayValue'], function(result) {
+if (string.indexOf(substring0) !== -1) {
 
-    doNewSubmissions = result.newSubmissionsCheckmark;
-    doOldSubmissions = result.alreadySubmittedCheckmark;
-    keyupDelay = result.keyupDelayValue;
+    // Currently only works on subreddits that take self text posts
+    $('.bottom-area:first').parent().parent().append('<div class="reddit-infobar"><div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
 
-    // Defaults
-    if (doNewSubmissions == undefined) { 
-        doNewSubmissions = true; 
-    }
-    if (doOldSubmissions == undefined) { 
-        doOldSubmissions = true; 
-    }
-    if (keyupDelay == undefined) { 
-        keyupDelay = 100;
-    }
+    $('#loadingDiv').hide();
 
-    var string = window.location.href,
-    substring0 = "submit";
-    substring1 = "comments";
-    if (string.indexOf(substring0) !== -1 && doNewSubmissions) {
-
-        // Currently only works on subreddits that take self text posts
-        $('.bottom-area:first').parent().append('<div style="font-size: large;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div>');
-
-        $('#loadingDiv').hide();
-
-        $(document)
-            .ajaxStart(function () {
-                $("#loadingDiv").show();
-            })
-            .ajaxStop(function () {
-                $("#loadingDiv").hide();
-            });
-
-        $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, keyupDelay);
-        $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, keyupDelay);
-
-    } else if (string.indexOf(substring1) !== -1 && doOldSubmissions) {
-
-        $('.flat-list:eq(3)').append('<div style="font-size: large;" id="insightsuggestions">communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div>');
-        $.ajax
-        ({
-            type: "POST",
-            url: "https://insight.barnett.science/api/already_posted/1234",
-            dataType: "json",
-            data: JSON.stringify({ "url": window.location.href}),
-            contentType: "application/json",
-            success: function (result) {
-                if (result != "") {
-                    $('#insightsuggestions').html('<div style="font-size: large;">communities with content like this</div>');
-                    for (var i = 0; i < result.length; i++) {
-                        $('#insightsuggestions').append('<a style="font-size: small;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
-                    }
-                }
-            },
-            error: function(xhr, status, error) {
-                $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
-            }
+    $(document)
+        .ajaxStart(function () {
+            $("#loadingDiv").show();
+        })
+        .ajaxStop(function () {
+            $("#loadingDiv").hide();
         });
-    }
 
-});
+    $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, keyupDelay);
+    $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, keyupDelay);
+
+} else if (string.indexOf(substring1) !== -1) {
+
+    $('.flat-list:eq(3)').append('<div class="reddit-infobar"><div style="font-size: large;" id="insightsuggestions">communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
+    $.ajax
+    ({
+        type: "POST",
+        url: "https://insight.barnett.science/api/already_posted/1234",
+        dataType: "json",
+        data: JSON.stringify({ "url": window.location.href}),
+        contentType: "application/json",
+        success: function (result) {
+            if (result != "") {
+                $('#insightsuggestions').html('<div style="font-size: large;">communities with content like this</div>');
+                $('#insightsuggestions').append('<p style="font-size: x-small;">subscribers &gt; 130,000</p><p>')
+                for (var i = 0; i < 3; i++) {
+                    $('#insightsuggestions').append('<a target="_blank" style="font-size: small;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
+                }
+                $('#insightsuggestions').append('</p><br><p style="font-size: x-small;">130,000 &gt; subscribers &gt; 55,000</p><p>')
+                for (var i = 3; i < 6; i++) {
+                    $('#insightsuggestions').append('<a target="_blank" style="font-size: small;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
+                }
+                $('#insightsuggestions').append('</p><br><p style="font-size: x-small;">55,000 &gt; subscribers &gt; 33,000</p><p>')
+                for (var i = 6; i < result.length; i++) {
+                    $('#insightsuggestions').append('<a target="_blank" style="font-size: small;" href="https://old.reddit.com/r/' + result[i] + '">' + result[i] + '</a> ');
+                }
+                $('#insightsuggestions').append("</p>")
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
+        }
+    });
+}
