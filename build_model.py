@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import f1_score
 import sqlalchemy
 import sql_scripts
 
@@ -47,7 +48,7 @@ f = open("log", "w")
 # Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-    alternate_sign=False
+    alternate_sign=False, norm="l1"
 )
 
 engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
@@ -142,6 +143,9 @@ for model in models:
             X_val, y_val = parse_data_chunk(chunk, vectorizer)
 
             score = sgd_cv.score(X_val, y_val)
+            f.write(f"accuracy = {score}\n")
+            score = f1_score(y_val, sgd_cv.predict(X_val), average='weighted')
+            f.write(f"f1 score = {score}\n")
             if score > best_score:
                 best_score = score
                 best_alpha = alpha
@@ -187,13 +191,15 @@ for model in models:
         X_train, y_train = parse_data_chunk(chunk, vectorizer)
         sgd_train.partial_fit(X_train, y_train, classes)
         train_score = sgd_train.score(X_train, y_train)
+        train_f1_score = f1_score(y_train, sgd_train.predict(X_train), average='weighted')
         test_score = sgd_train.score(X_test, y_test)
-        f.write(f"{i} {train_score} {test_score}\n")
+        test_f1_score = f1_score(y_test, sgd_train.predict(X_test), average='weighted')
+        f.write(f"{i} {train_score} {test_score} {train_f1_score} {test_f1_score}\n")
         f.flush()
         del X_train
         del y_train
 
-    dump(sgd_train, train_outfile)
+    dump(sgd_train.sparsify(), train_outfile)
     del sgd_train
 
     ############## Entire data set
