@@ -47,7 +47,6 @@ def stemmed_words(doc):
     """
     doc = process_text(doc)
     stemmer = PorterStemmer()
-    tokens = word_tokenize(doc)
     analyser = CountVectorizer.build_analyzer()
     tokens = analyzer(doc)
     return (stemmer.stem(w) for w in tokens)
