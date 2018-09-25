@@ -61,9 +61,6 @@ for model in models:
     outfile = model["outfile"]
     train_outfile = model["train_outfile"]
 
-    # For test set and validation set
-    limit = chunksize*cv_chunks*2
-
     if subscribers_ulimit == None:
         classes = pd.read_sql(
             f"""
@@ -83,7 +80,7 @@ for model in models:
     f.write(f"Number of classes: {classes.shape[0]}\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
+    df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
 
     # Hold out test set (8 chunks)
@@ -98,8 +95,8 @@ for model in models:
     f.flush()
     for i, alpha in enumerate(np.logspace(-7,-3,5)):
 
-        # Logistic Regression because we want probabilities; default is SVM
-        sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+        sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+                random_state=0)
 
         df = pd.read_sql(f"select * from {table_name};", engine,
                 chunksize=chunksize)
@@ -124,7 +121,7 @@ for model in models:
             del y_train
 
         # Re-read from beginning of table
-        df = pd.read_sql(f"select * from {table_name} limit {limit};", engine,
+        df = pd.read_sql(f"select * from {table_name};", engine,
                 chunksize=chunksize)
 
         # Skip hold out test set
@@ -174,7 +171,8 @@ for model in models:
     df = pd.read_sql(f"select * from {table_name};", engine,
             chunksize=chunksize)
 
-    sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+    sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+            random_state=0)
 
     # Skip test set
     chunk = next(df)
@@ -198,7 +196,8 @@ for model in models:
     del sgd_train
 
     ############## Entire data set
-    sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3)
+    sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
+            random_state=0)
     f.write("Performing training on entire data set...\n")
     f.flush()
 
