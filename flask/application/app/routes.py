@@ -21,8 +21,8 @@ reddit = praw.Reddit(client_id=client_id,
 
 print(reddit.user.me())
 vectorizer = HashingVectorizer(
-    decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2 ** 18,
-    alternate_sign=False
+    decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
+    alternate_sign=False, norm="l1", stop_words="english"
 )
 
 clf = [load(wwwdir + 'MODELS/sgd_svm_large.gz'),
