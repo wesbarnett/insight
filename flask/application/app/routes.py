@@ -73,6 +73,7 @@ def already_posted(uuid):
 
     title = submission.title
     text = submission.selftext
+    subreddit = submission.subreddit
     X = title + " " + text
     X = vectorizer.transform([X])
 
@@ -82,6 +83,9 @@ def already_posted(uuid):
             argsorted_dec = i.decision_function(X).argsort()[0][::-1]
             sorted_classes = i.classes_[argsorted_dec]
         selected_predictions += list(sorted_classes[:3])
+
+    # Remove prediction if it is the same subreddit you are in
+    selected_predictions.remove(subreddit)
 
     return jsonify(selected_predictions)
 
