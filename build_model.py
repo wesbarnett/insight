@@ -1,7 +1,5 @@
 # Parameter selection using cross-validation
 
-# TODO: Learning curves?
-
 import nlp_scripts
 import numpy as np
 import pandas as pd
