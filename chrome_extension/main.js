@@ -59,8 +59,8 @@ if (string.indexOf(substring0) !== -1) {
             $("#loadingDiv").hide();
         });
 
-    $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, keyupDelay);
-    $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, keyupDelay);
+    $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, 100);
+    $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, 100);
 
 } else if (string.indexOf(substring1) !== -1) {
 
