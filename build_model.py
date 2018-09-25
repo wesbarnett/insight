@@ -82,16 +82,6 @@ for model in models:
     f.write(f"Number of classes: {classes.shape[0]}\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name};", engine,
-            chunksize=chunksize)
-
-    # Hold out test set (8 chunks)
-    f.write("Skipping test and validation sets...\n")
-    f.flush()
-    for i in range(cv_chunks*2):
-        chunk = next(df)
-
-    sgd_cv_scores = {}
     best_score = 0.
     f.write("Training models...\n")
     f.flush()
@@ -134,7 +124,6 @@ for model in models:
         # Validation set scoring
         f.write("Calculating validation score...\n")
         f.flush()
-        sgd_cv_scores[alpha] = []
         score_avg = 0.
         for chunk in range(cv_chunks):
 
@@ -154,7 +143,6 @@ for model in models:
             del y_val
 
             score_avg += score
-            sgd_cv_scores[alpha].append(score)
 
         score_avg /= cv_chunks
 
@@ -167,7 +155,6 @@ for model in models:
     f.flush()
 
     del sgd_cv
-    del sgd_cv_scores
 
     ############## Training set (including validation set)
     f.write("Performing training on entire training set...\n")
@@ -183,7 +170,7 @@ for model in models:
     chunk = next(df)
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
-    f.write(f"N  Train Score  Test Score\n")
+    f.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
     f.flush()
     i = 0
     for chunk in df:
