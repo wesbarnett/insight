@@ -3,7 +3,6 @@
 from re import sub
 from string import punctuation
 from nltk.stem.porter import PorterStemmer
-from nltk import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 
 def process_text(txt):
@@ -49,4 +48,6 @@ def stemmed_words(doc):
     doc = process_text(doc)
     stemmer = PorterStemmer()
     tokens = word_tokenize(doc)
+    analyser = CountVectorizer.build_analyzer()
+    tokens = analyzer(doc)
     return (stemmer.stem(w) for w in tokens)
