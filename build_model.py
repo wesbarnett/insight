@@ -51,7 +51,6 @@ f.write('\n')
 f.write(time.ctime())
 f.write('\n')
 
-# Stop words are taken care of in analyzer
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
     alternate_sign=False, norm="l1", stop_words="english"
