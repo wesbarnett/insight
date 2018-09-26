@@ -71,7 +71,7 @@ for model in models:
 
     print(classes.shape[0])
 
-    df = pd.read_sql(f"select * from {table_name};", engine,
+    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
             chunksize=chunksize)
 
     chunk = next(df)
