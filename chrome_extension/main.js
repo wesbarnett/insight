@@ -13,24 +13,8 @@ function handler() {
             data: JSON.stringify({ "title": title, "text" : text}),
             contentType: "application/json",
             success: function (result) {
-                // TODO: Make this a link the user can click and then populate the "choose
-                // where to post" field or add link to subscribe.
-                myhtml =  '<p style="font-size: small;">subscribers &gt; 130,000</p><p>';
-                for (var i = 0; i < 3; i++) {
-                    myhtml += '<a style="font-size: medium;" target="_blank" href="https://www.reddit.com/r/' + result[i] + '/submit?selftext=true&title=' + title + '&text=' + text +'" class="sr-suggestion" tabindex="100">' + result[i] + '</a>';
-                    if (i != 2) {
-                        myhtml += ' &middot; '
-                    }
-                }
-                myhtml += '</p><br><p style="font-size: small;">130,000 &gt; subscribers &gt; 55,000</p><p>';
-                for (var i = 3; i < 6; i++) {
-                    myhtml += '<a style="font-size: medium;" target="_blank" href="https://www.reddit.com/r/' + result[i] + '/submit?selftext=true&title=' + title + '&text=' + text +'" class="sr-suggestion" tabindex="100">' + result[i] + '</a>';
-                    if (i != 5) {
-                        myhtml += ' &middot; '
-                    }
-                }
-                myhtml += '</p><br><p style="font-size: small;">55,000 &gt; subscribers &gt; 33,000</p><p>';
-                for (var i = 6; i < result.length; i++) {
+                myhtml = ""
+                for (var i = 0; i < result.length; i++) {
                     myhtml += '<a style="font-size: medium;" target="_blank" href="https://www.reddit.com/r/' + result[i] + '/submit?selftext=true&title=' + title + '&text=' + text +'" class="sr-suggestion" tabindex="100">' + result[i] + '</a>';
                     if (i != result.length-1) {
                         myhtml += ' &middot; '
@@ -85,24 +69,9 @@ if (string.indexOf(substring0) !== -1) {
         data: JSON.stringify({ "url": window.location.href}),
         contentType: "application/json",
         success: function (result) {
-            if (result != "") {
+            if (result.length > 0) {
                 myhtml = '<div style="font-size: large; line-height: 1.2em"><b>communities with content like this</b></div>';
-                myhtml += '<p style="font-size: small;">subscribers &gt; 130,000</p><p>';
-                for (var i = 0; i < 3; i++) {
-                    myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
-                    if (i != 2) {
-                        myhtml += ' &middot; '
-                    }
-                }
-                myhtml += '</p><br><p style="font-size: small;">130,000 &gt; subscribers &gt; 55,000</p><p>';
-                for (var i = 3; i < 6; i++) {
-                    myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
-                    if (i != 5) {
-                        myhtml += ' &middot; '
-                    }
-                }
-                myhtml += '</p><br><p style="font-size: small;">55,000 &gt; subscribers &gt; 33,000</p><p>';
-                for (var i = 6; i < result.length; i++) {
+                for (var i = 0; i < result.length; i++) {
                     myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
                     if (i != result.length-1) {
                         myhtml += ' &middot; '

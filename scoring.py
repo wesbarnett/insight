@@ -18,13 +18,13 @@ def parse_data_chunk(chunk, vectorizer):
 # 711014
 model_large = {"subscribers_ulimit": None, "subscribers_llimit": 1.3e5, "cv_chunks": 1,
         "chunksize": 7e4, "table_name": "submissions_0", "outfile":
-        "MODELS_L1_NORM_OLD/sgd_svm_large.gz", "train_outfile": "MODELS_L1_NORM_OLD/sgd_svm_train_large.gz"
+        "MODELS/sgd_svm_large.gz", "train_outfile": "MODELS/sgd_svm_train_large.gz"
         }
 
 # 452885
 model_med = {"subscribers_ulimit": 1.3e5, "subscribers_llimit": 5.5e4, "cv_chunks": 1,
         "chunksize": 4e4, "table_name": "submissions_1", "outfile":
-        "MODELS_L1_NORM_OLD/sgd_svm_med.gz", "train_outfile": "MODELS_L1_NORM_OLD/sgd_svm_train_med.gz"
+        "MODELS/sgd_svm_med.gz", "train_outfile": "MODELS/sgd_svm_train_med.gz"
         }
 
 # 209340
@@ -33,8 +33,7 @@ model_small = {"subscribers_ulimit": 5.5e4, "subscribers_llimit": 3.3e4, "cv_chu
         "MODELS/sgd_svm_small.gz", "train_outfile": "MODELS/sgd_svm_train_small.gz"
         }
 
-#models = [model_small, model_med, model_large]
-models = [model_small]
+models = [model_large]
 
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
@@ -79,20 +78,19 @@ for model in models:
     print(X.shape)
 
     sgd = load(train_outfile)
-#   y_pred = sgd.predict(X)
+    y_pred = sgd.predict(X)
 #   print(classification_report(y_true, y_pred))
 
-#   argsorted_dec = sgd.decision_function(X).argsort(axis=1)
-#   sorted_classes = sgd.classes_[argsorted_dec]
+    argsorted_dec = sgd.decision_function(X).argsort(axis=1)
+    sorted_classes = sgd.classes_[argsorted_dec]
 
-#   score = 0.0
-#   top_n = 1
-#   for top_n in range(1,6):
-#       for i,j in enumerate(sorted_classes):
-#           if y_true[i] in j.ravel()[::-1][0:top_n]:
-#               score += 1.0
-#       score /= y_true.shape[0] 
-#       print(f"Top {top_n} mean accuracy: {score}")
-
-#   print(score)
-    print(sgd.score(X, y_true))
+    print("k accuracy")
+    for top_n in range(1,100):
+        score = 0.0
+        for i,j in enumerate(sorted_classes):
+            if y_true[i] in j.ravel()[::-1][0:top_n]:
+                score += 1.0
+        score /= y_true.shape[0] 
+        print(f"{top_n} {score}")
+        if (score >= 0.90):
+            break;
