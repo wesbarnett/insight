@@ -60,7 +60,7 @@ if (string.indexOf(substring0) !== -1) {
 // ALREADY SUBMITTED ------------------------------------------------
 } else if (string.indexOf(substring1) !== -1) {
 
-    $('.flat-list:eq(3)').parent().append('<div class="reddit-infobar"><div style="font-size: large;" id="insightsuggestions"><b>communities with content like this</b><span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
+    $('.flat-list:eq(3)').parent().append('<div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
     $.ajax
     ({
         type: "POST",
@@ -70,7 +70,7 @@ if (string.indexOf(substring0) !== -1) {
         contentType: "application/json",
         success: function (result) {
             if (result.length > 0) {
-                myhtml = '<div style="font-size: large; line-height: 1.2em"><b>communities with content like this</b></div>';
+                myhtml = '<div style="font-size: large; line-height: 1.2em"><b>other communities with content like this</b></div>';
                 for (var i = 0; i < result.length; i++) {
                     myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
                     if (i != result.length-1) {
@@ -79,6 +79,9 @@ if (string.indexOf(substring0) !== -1) {
                 }
                 myhtml += '</p>';
                 $('#insightsuggestions').html(myhtml);
+            }
+            else {
+                $('#insightsuggestionsbar').remove()
             }
         },
         error: function(xhr, status, error) {
