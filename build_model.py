@@ -95,7 +95,7 @@ for model in models:
         sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3,
                 random_state=0)
 
-        df = pd.read_sql(f"select * from {table_name};", engine,
+        df = pd.read_sql(f"select * from {table_name} order by index;", engine,
                 chunksize=chunksize)
 
         # Skip hold out test set and validation set
@@ -119,7 +119,7 @@ for model in models:
             del y_train
 
         # Re-read from beginning of table
-        df = pd.read_sql(f"select * from {table_name};", engine,
+        df = pd.read_sql(f"select * from {table_name} order by index;", engine,
                 chunksize=chunksize)
 
         # Skip hold out test set
@@ -166,7 +166,7 @@ for model in models:
     f.write("Performing training on entire training set...\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name};", engine,
+    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
             chunksize=chunksize)
 
     sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
@@ -202,7 +202,7 @@ for model in models:
     f.write("Performing training on entire data set...\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name};", engine,
+    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
             chunksize=chunksize)
 
     j = 0
