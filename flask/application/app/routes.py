@@ -19,13 +19,13 @@ reddit = praw.Reddit(client_id=client_id,
                      refresh_token=refresh_token,
                      user_agent=user_agent)
 
-print(reddit.user.me())
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
     alternate_sign=False, norm="l1", stop_words="english"
 )
 
 threshold = -1.0
+max_predicted_classes = 3
 
 clf = [load(wwwdir + 'MODELS/sgd_svm_large.gz'),
     load(wwwdir + 'MODELS/sgd_svm_med.gz'),
@@ -47,11 +47,11 @@ def add_message(uuid):
     """
     This route will be accessed remotely from the Chrome extension. It takes the user
     input (which is the Reddit submission's title and text) and returns the top 3
-    predicted subreddits for each model. Then it returns the results back to the
-    extension so it can display them.
+    predicted subreddits for each model if they are close enough to the decision
+    boundary (or are across it). Then it returns the results back to the extension so it
+    can display them.
     """
     content = request.json
-    print(content)
     title = content["title"]
     text = content["text"]
     X = title + " " + text
@@ -62,17 +62,21 @@ def add_message(uuid):
         with sklearn.config_context(assume_finite=True):
             my_dec = i.decision_function(X)
             argsorted_dec = my_dec.argsort()[0][::-1]
-            argsorted_dec_thresh = argsorted_dec[my_dec[0][argsorted_dec] > threshold]
+            argsorted_dec_thresh = argsorted_dec[:max_predicted_classes][my_dec[0][argsorted_dec[:max_predicted_classes]] > threshold]
             sorted_classes = i.classes_[argsorted_dec_thresh]
-        selected_predictions += list(sorted_classes[:3])
+        selected_predictions += list(sorted_classes)
 
     return jsonify(selected_predictions)
 
 @app.route("/api/already_posted/<uuid>", methods=["GET", "POST"])
 def already_posted(uuid):
+    """
+    This route is accessed from submissions pages that already exist. It returns the top
+    3 predictions for each model if they meet the threshold specified above. It will not
+    suggest a subreddit the post is actually in. It also uses the Reddit API to get the
+    actual information about the page.
+    """
     content = request.json
-    print(content)
-
     submission = praw.models.Submission(reddit, url=content["url"])
 
     title = submission.title
@@ -86,12 +90,11 @@ def already_posted(uuid):
         with sklearn.config_context(assume_finite=True):
             my_dec = i.decision_function(X)
             argsorted_dec = my_dec.argsort()[0][::-1]
-            argsorted_dec_thresh = argsorted_dec[my_dec[0][argsorted_dec] > threshold]
+            argsorted_dec_thresh = argsorted_dec[:max_predicted_classes][my_dec[0][argsorted_dec[:max_predicted_classes]] > threshold]
             sorted_classes = i.classes_[argsorted_dec_thresh]
-        selected_predictions += list(sorted_classes[:3])
+        selected_predictions += list(sorted_classes)
 
     # Remove prediction if it is the same subreddit you are in
-    # TODO?
     if subreddit in selected_predictions:
         selected_predictions.remove(subreddit)
 
