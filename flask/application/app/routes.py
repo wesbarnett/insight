@@ -25,6 +25,7 @@ vectorizer = HashingVectorizer(
 )
 
 threshold = -1.0
+max_predicted_classes = 3
 
 clf = [load(wwwdir + 'MODELS/sgd_svm_large.gz'),
     load(wwwdir + 'MODELS/sgd_svm_med.gz'),
@@ -61,9 +62,9 @@ def add_message(uuid):
         with sklearn.config_context(assume_finite=True):
             my_dec = i.decision_function(X)
             argsorted_dec = my_dec.argsort()[0][::-1]
-            argsorted_dec_thresh = argsorted_dec[my_dec[0][argsorted_dec] > threshold]
+            argsorted_dec_thresh = argsorted_dec[:max_predicted_classes][my_dec[0][argsorted_dec[:max_predicted_classes]] > threshold]
             sorted_classes = i.classes_[argsorted_dec_thresh]
-        selected_predictions += list(sorted_classes[:3])
+        selected_predictions += list(sorted_classes)
 
     return jsonify(selected_predictions)
 
@@ -89,9 +90,9 @@ def already_posted(uuid):
         with sklearn.config_context(assume_finite=True):
             my_dec = i.decision_function(X)
             argsorted_dec = my_dec.argsort()[0][::-1]
-            argsorted_dec_thresh = argsorted_dec[my_dec[0][argsorted_dec] > threshold]
+            argsorted_dec_thresh = argsorted_dec[:max_predicted_classes][my_dec[0][argsorted_dec[:max_predicted_classes]] > threshold]
             sorted_classes = i.classes_[argsorted_dec_thresh]
-        selected_predictions += list(sorted_classes[:3])
+        selected_predictions += list(sorted_classes)
 
     # Remove prediction if it is the same subreddit you are in
     if subreddit in selected_predictions:
