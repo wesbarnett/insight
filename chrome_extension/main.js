@@ -10,7 +10,7 @@ function handler() {
             type: "POST",
             url: "https://insight.barnett.science/api/add_message/" + uuid,
             dataType: "json",
-            data: JSON.stringify({ "title": title, "text" : text}),
+            data: JSON.stringify({ "title": title, "text" : text, "max_per_model": max_per_model, "threshold": threshold}),
             contentType: "application/json",
             success: function (result) {
                 myhtml = ""
@@ -38,9 +38,11 @@ var string = window.location.href,
 substring0 = "submit";
 substring1 = "comments";
 
-chrome.storage.sync.get(['uuid'], function(result) {
+chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold'], function(result) {
 
 	uuid = result.uuid;
+    max_per_model = result.max_per_model;
+    threshold = result.threshold;
 
 	// NEW POSTS -----------------------------------------
 	if (string.indexOf(substring0) !== -1) {
@@ -64,13 +66,13 @@ chrome.storage.sync.get(['uuid'], function(result) {
 	// ALREADY SUBMITTED ------------------------------------------------
 	} else if (string.indexOf(substring1) !== -1) {
 
-		$('.flat-list:eq(3)').parent().append('<div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
+		$('.flat-list:eq(3)').parent().append('<br><div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
 		$.ajax
 		({
 			type: "POST",
 			url: "https://insight.barnett.science/api/already_posted/" + uuid,
 			dataType: "json",
-			data: JSON.stringify({ "url": window.location.href}),
+			data: JSON.stringify({ "url": window.location.href, "max_per_model": max_per_model, "threshold": threshold}),
 			contentType: "application/json",
 			success: function (result) {
 				if (result.length > 0) {
