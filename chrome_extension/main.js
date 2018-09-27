@@ -40,7 +40,6 @@ substring1 = "comments";
 
 chrome.storage.sync.get(['uuid'], function(result) {
 
-	console.log('UUID = ' + result.uuid);
 	uuid = result.uuid;
 
 	// NEW POSTS -----------------------------------------
