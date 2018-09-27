@@ -8,7 +8,7 @@ function handler() {
         $.ajax
         ({
             type: "POST",
-            url: "https://insight.barnett.science/api/add_message/1234",
+            url: "https://insight.barnett.science/api/add_message/" + uuid,
             dataType: "json",
             data: JSON.stringify({ "title": title, "text" : text}),
             contentType: "application/json",
@@ -38,54 +38,61 @@ var string = window.location.href,
 substring0 = "submit";
 substring1 = "comments";
 
-// NEW POSTS -----------------------------------------
-if (string.indexOf(substring0) !== -1) {
+chrome.storage.sync.get(['uuid'], function(result) {
 
-    // Currently only works on subreddits that take self text posts
-    $('.bottom-area:first').parent().append('<div class="reddit-infobar"><div style="font-size: large; font-weight: bold;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
+	console.log('UUID = ' + result.uuid);
+	uuid = result.uuid;
 
-    $('#loadingDiv').hide();
+	// NEW POSTS -----------------------------------------
+	if (string.indexOf(substring0) !== -1) {
 
-    $(document)
-        .ajaxStart(function () {
-            $("#loadingDiv").show();
-        })
-        .ajaxStop(function () {
-            $("#loadingDiv").hide();
-        });
+		// Currently only works on subreddits that take self text posts
+		$('.bottom-area:first').parent().append('<div class="reddit-infobar"><div style="font-size: large; font-weight: bold;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
 
-    $('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, 100);
-    $('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, 100);
+		$('#loadingDiv').hide();
 
-// ALREADY SUBMITTED ------------------------------------------------
-} else if (string.indexOf(substring1) !== -1) {
+		$(document)
+			.ajaxStart(function () {
+				$("#loadingDiv").show();
+			})
+			.ajaxStop(function () {
+				$("#loadingDiv").hide();
+			});
 
-    $('.flat-list:eq(3)').parent().append('<div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
-    $.ajax
-    ({
-        type: "POST",
-        url: "https://insight.barnett.science/api/already_posted/1234",
-        dataType: "json",
-        data: JSON.stringify({ "url": window.location.href}),
-        contentType: "application/json",
-        success: function (result) {
-            if (result.length > 0) {
-                myhtml = '<div style="font-size: large; line-height: 1.2em"><b>other communities with content like this</b></div>';
-                for (var i = 0; i < result.length; i++) {
-                    myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
-                    if (i != result.length-1) {
-                        myhtml += ' &middot; '
-                    }
-                }
-                myhtml += '</p>';
-                $('#insightsuggestions').html(myhtml);
-            }
-            else {
-                $('#insightsuggestionsbar').remove()
-            }
-        },
-        error: function(xhr, status, error) {
-            $('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
-        }
-    });
-}
+		$('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, 150);
+		$('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, 150);
+
+	// ALREADY SUBMITTED ------------------------------------------------
+	} else if (string.indexOf(substring1) !== -1) {
+
+		$('.flat-list:eq(3)').parent().append('<div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
+		$.ajax
+		({
+			type: "POST",
+			url: "https://insight.barnett.science/api/already_posted/" + uuid,
+			dataType: "json",
+			data: JSON.stringify({ "url": window.location.href}),
+			contentType: "application/json",
+			success: function (result) {
+				if (result.length > 0) {
+					myhtml = '<div style="font-size: large; line-height: 1.2em"><b>other communities with content like this</b></div>';
+					for (var i = 0; i < result.length; i++) {
+						myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
+						if (i != result.length-1) {
+							myhtml += ' &middot; '
+						}
+					}
+					myhtml += '</p>';
+					$('#insightsuggestions').html(myhtml);
+				}
+				else {
+					$('#insightsuggestionsbar').remove()
+				}
+			},
+			error: function(xhr, status, error) {
+				$('#insightsuggestions').html('<p class="error">error loading communities with similar content</p>');
+			}
+		});
+	}
+
+});
