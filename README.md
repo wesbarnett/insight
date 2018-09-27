@@ -18,7 +18,7 @@ text post from any subreddit or from
 [here](https://old.reddit.com/submit?selftext=true). While typing in your new
 submission, subreddits with similar content will show up below the input.
 
-[![Screenshot of submissions page](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot4.png | width=100)](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot4.png)
+[<img alt="Screenshot of submissions page" src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot4.png" width=100>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot4.png)
 
 If you want to submit your content to one of those subreddits, click the link indicating
 the subreddit and a new window with your post content will popup where you can submit
