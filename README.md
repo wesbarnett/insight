@@ -1,19 +1,21 @@
 # /r/eveal
 
+[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
+
 /r/eveal is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
-
+ 
 Reddit is a social media site where users engage in discussions in communities call
 subreddits, often denoted by `/r/*community_name*`. However, it's difficult to weed
 through all of the 900,000+ subreddits out there and find new communities other than the
-most popular ones.
+most popular ones. Additionally many subreddits have strict moderation and rules on what
+content they accept. Mods waste a lot of time removing posts and users can get
+frustrated.
 
 ## Installation and usage
 
 Install the Chrome extension from
 [the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
-
-[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
 text post from any subreddit or from
