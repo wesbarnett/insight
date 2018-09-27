@@ -14,8 +14,11 @@ Install the Chrome extension from
 [here](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
-text post. While typing in your new submission, subreddits with similar content will
-show up below the input.
+text post from any subreddit or from
+[here](https://old.reddit.com/submit?selftext=true). While typing in your new
+submission, subreddits with similar content will show up below the input.
+
+![Screenshot of submissions page][ss1]
 
 If you want to submit your content to one of those subreddits, click the link indicating
 the subreddit and a new window with your post content will popup where you can submit
@@ -30,15 +33,18 @@ the checkbox "Use the redesign as my default experience" is unchecked on your
 ## About the model
 
 Supervised learning models were trained on subsets of the May 2018 Reddit data corpus
-found here. I removed all over 18 communities and posts and only trained on "self text"
-posts. I used three models for three different groupings of subreddits based on the
-number of subscribers of those subreddits. 
+found [here](https://files.pushshift.io/reddit/). I removed all over-18 communities and
+posts and only trained on "self text" posts that were not deleted or removed. I used
+three models for three different groupings of subreddits based on the number of
+subscribers of those subreddits. 
 
-I used a bag-of-words approach using scikit-learn's HashingVectorizer with 2^(18)
-features and L1 normalization. The text of the title and of the post itself were used in
-this feature vectorization. The subreddit names were used as the labels. I attempted
-using out-of-core Naive Bayes, but ran into memory usage when training, even on the
-reduced training sets. I also tried Logistic Regression with Stochastic Gradient Descent
-(SGD) but the resulting models took up several GB of disk space. In the end. SGD with
-Support Vector Machine was used for classifying the posts in all of the models due to
-its fast predictions and low disk space.
+I used a bag-of-words approach using [scikit-learn](http://scikit-learn.org/stable/)'s
+HashingVectorizer with 2^(18) features and L1 normalization. The text of the title and
+of the post itself were used in this feature vectorization. The subreddit names were
+used as the labels. I attempted using out-of-core Naive Bayes, but ran into memory usage
+when training, even on the reduced training sets. I also tried Logistic Regression with
+Stochastic Gradient Descent (SGD) but the resulting models took up several GB of disk
+space. In the end, SGD with Support Vector Machine was used for classifying the posts in
+all of the models due to its fast predictions and low disk space.
+
+[ss1]: https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot4.png "Screenshot"
