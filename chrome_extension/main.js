@@ -38,14 +38,17 @@ var string = window.location.href,
 substring0 = "submit";
 substring1 = "comments";
 
-chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold'], function(result) {
+chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold', 'oldSubs', 'newSubs'], function(result) {
 
 	uuid = result.uuid;
     max_per_model = result.max_per_model;
     threshold = result.threshold;
+    oldSubs = result.oldSubs;
+    console.log(oldSubs);
+    newSubs = result.newSubs;
 
 	// NEW POSTS -----------------------------------------
-	if (string.indexOf(substring0) !== -1) {
+	if ((string.indexOf(substring0) !== -1) && newSubs) {
 
 		// Currently only works on subreddits that take self text posts
 		$('.bottom-area:first').parent().append('<div class="reddit-infobar"><div style="font-size: large; font-weight: bold;">communities with content like this<span id="loadingDiv" class="error">&nbsp;&nbsp;&nbsp;loading...</span></div><div id="insightsuggestions">start typing above!</div></div>');
@@ -64,7 +67,7 @@ chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold'], function(result)
 		$('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, 150);
 
 	// ALREADY SUBMITTED ------------------------------------------------
-	} else if (string.indexOf(substring1) !== -1) {
+	} else if ((string.indexOf(substring1) !== -1) && oldSubs) {
 
 		$('.flat-list:eq(3)').parent().append('<br><div class="reddit-infobar" id="insightsuggestionsbar"><div style="font-size: large;" id="insightsuggestions"><b>other communities with content like this<span class="error">&nbsp;&nbsp;&nbsp;loading...</span></div></div>');
 		$.ajax
