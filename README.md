@@ -1,17 +1,21 @@
 # /r/eveal
 
+[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
+
 /r/eveal is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
-
+ 
 Reddit is a social media site where users engage in discussions in communities call
 subreddits, often denoted by `/r/*community_name*`. However, it's difficult to weed
 through all of the 900,000+ subreddits out there and find new communities other than the
-most popular ones.
+most popular ones. Additionally many subreddits have strict moderation and rules on what
+content they accept. Mods waste a lot of time removing posts and users can get
+frustrated.
 
 ## Installation and usage
 
 Install the Chrome extension from
-[here](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
+[the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
 text post from any subreddit or from
@@ -40,11 +44,10 @@ three models for three different groupings of subreddits based on the number of
 subscribers of those subreddits. 
 
 I used a bag-of-words approach using [scikit-learn](http://scikit-learn.org/stable/)'s
-HashingVectorizer with 2^(18) features and L1 normalization. The text of the title and
+HashingVectorizer with 2<sup>18</sup> features and L1 normalization. The text of the title and
 of the post itself were used in this feature vectorization. The subreddit names were
 used as the labels. I attempted using out-of-core Naive Bayes, but ran into memory usage
 when training, even on the reduced training sets. I also tried Logistic Regression with
 Stochastic Gradient Descent (SGD) but the resulting models took up several GB of disk
 space. In the end, SGD with Support Vector Machine was used for classifying the posts in
 all of the models due to its fast predictions and low disk space.
-

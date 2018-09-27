@@ -157,15 +157,3 @@ def query_submissions(
     engine.dispose()
 
     return df
-
-
-# TODO: use this in Jupyter notebook??
-def filter_by_min_submissions(df, min_submissions):
-    """
-    Only have submissions that are in subreddits that appear a minimum number of times
-    in the data set.
-    """
-
-    sublist = df["subreddit"].value_counts() > min_submissions
-    df = df[df["subreddit"].isin(sublist[sublist].index.tolist())]
-    return df
