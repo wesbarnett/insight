@@ -24,9 +24,6 @@ vectorizer = HashingVectorizer(
     alternate_sign=False, norm="l1", stop_words="english"
 )
 
-threshold = -1.0
-max_predicted_classes = 3
-
 clf = [load(wwwdir + 'MODELS/sgd_svm_large.gz'),
     load(wwwdir + 'MODELS/sgd_svm_med.gz'),
     load(wwwdir + 'MODELS/sgd_svm_small.gz')]
@@ -54,6 +51,8 @@ def add_message(uuid):
     content = request.json
     title = content["title"]
     text = content["text"]
+    threshold = content["threshold"]
+    max_predicted_classes = content["max_per_model"]
     X = title + " " + text
     X = vectorizer.transform([X])
 
@@ -78,6 +77,8 @@ def already_posted(uuid):
     """
     content = request.json
     submission = praw.models.Submission(reddit, url=content["url"])
+    threshold = content["threshold"]
+    max_predicted_classes = content["max_per_model"]
 
     title = submission.title
     text = submission.selftext
