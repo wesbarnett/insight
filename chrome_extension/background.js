@@ -5,10 +5,9 @@ function uuidv4() {
   });
 }
 
-chrome.storage.sync.clear();
 chrome.runtime.onInstalled.addListener(function() {
     myuuid = uuidv4()
-    chrome.storage.sync.set({uuid: myuuid, max_per_model: 3, threshold: -1}, function() {
+    chrome.storage.sync.set({uuid: myuuid, max_per_model: 3, threshold: -1, oldSubs: true, newSubs: true}, function() {
         console.log("uuid = " + myuuid);
     });
 });

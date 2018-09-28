@@ -1,8 +1,42 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="title" content="{{ page.meta_title }}">
+    <meta name="description" content="{{ page.meta_description }}">
   </head>
   <body>
-    <h1><a href="https://insight.barnett.science">Homepage</a></h1>
+    <h1>/r/eveal settings</h1>
+    <table>
+        <tr>
+            <td>Display on new submissions page when entering text</td>
+            <td><input type="checkbox" id="newSubs" checked></td>
+        </tr>
+        <tr>
+            <td>Display when viewing submissions</td>
+            <td><input type="checkbox" id="oldSubs" checked></td>
+        </tr>
+        <tr>
+            <td>Confidence threshold</td>
+            <td>low <input type="range" min="-30" max="10" value="-10" class="slider" id="threshold"> high</td>
+        </tr>
+        <tr>
+            <td>Maximum subreddits shown</td>
+            <td><select id="max_predictions">
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9" selected="selected">9</option>
+                <option value="12">12</option>
+                <option value="15">15</option>
+                <option value="18">18</option>
+                </select></td>
+        </tr>
+    </table>
+    <p><button id="resetButton">Defaults</button>
+    <button id="submitButton">Save</button>
+    <a href="https://github.com/wesbarnett/insight">About</a></p>
+    <div id="saved" style="display: none; color: red;">Changes saved.</div>
   </body>
+  <script src="options.js"></script>
 </html>
