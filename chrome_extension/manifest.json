@@ -1,6 +1,6 @@
 {
-	"name": "/r/eveal",
-	"version": "0.2",
+	"name": "r/eveal",
+	"version": "0.3",
     "author": "Wes Barnett",
     "homepage_url": "https://insight.barnett.science",
 	"description": "Tags Reddit posts and submitted content with subreddits that have similar content so that users can discover new communities.",
