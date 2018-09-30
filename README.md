@@ -1,16 +1,23 @@
 # r/eveal
 
+"reveal"
+
 [<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
-/r/eveal is a Chrome extension to enhance the user experience on Reddit by helping users
+`r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
  
 Reddit is a social media site where users engage in discussions in communities call
-subreddits, often denoted by `/r/*community_name*`. However, it's difficult to weed
-through all of the 900,000+ subreddits out there and find new communities other than the
-most popular ones. Additionally many subreddits have strict moderation and rules on what
-content they accept. Mods waste a lot of time removing posts and users can get
-frustrated.
+subreddits, often denoted by `r/*community_name*`. However, it's difficult to weed
+through all of the 130,000+ active subreddits out there and find new communities other
+than the most popular ones. Additionally many subreddits have strict moderation and
+rules on what content they accept. Mods waste a lot of time removing posts and users can
+get frustrated.
+
+This extension adds a new information box underneath the submission form, showing
+communities related to the content being typed into the text box. Users will discover
+new communities related to what they are interested in. Additionally a new information
+box lists communities related to posts the user is viewing.
 
 ## Installation and usage
 
@@ -18,7 +25,7 @@ Install the Chrome extension from
 [the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
-text post from any subreddit or from
+text post from any subreddit or form
 [here](https://old.reddit.com/submit?selftext=true). While typing in your new
 submission, subreddits with similar content will show up below the input.
 
@@ -35,7 +42,7 @@ Suggestions of similar communities of content you view will also be shown automa
 the checkbox "Use the redesign as my default experience" is unchecked on your
 [preferences page](https://www.reddit.com/prefs).
 
-## About the model
+## About the models
 
 Supervised learning models were trained on subsets of the May 2018 Reddit data corpus
 found [here](https://files.pushshift.io/reddit/). I removed all over-18 communities and
