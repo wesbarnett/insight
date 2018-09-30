@@ -36,7 +36,7 @@ def index():
     extension.
     """
     page = {}
-    page['title'] = 'Subreddits with Content Like This'
+    page['title'] = 'r/eveal'
     return render_template("index.html", page=page)
 
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
