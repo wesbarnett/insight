@@ -44,7 +44,6 @@ chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold', 'oldSubs', 'newSu
     max_per_model = result.max_per_model;
     threshold = result.threshold;
     oldSubs = result.oldSubs;
-    console.log(oldSubs);
     newSubs = result.newSubs;
 
 	// NEW POSTS -----------------------------------------

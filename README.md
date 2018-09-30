@@ -1,4 +1,4 @@
-# /r/eveal
+# r/eveal
 
 [<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
@@ -40,8 +40,8 @@ the checkbox "Use the redesign as my default experience" is unchecked on your
 Supervised learning models were trained on subsets of the May 2018 Reddit data corpus
 found [here](https://files.pushshift.io/reddit/). I removed all over-18 communities and
 posts and only trained on "self text" posts that were not deleted or removed. I used
-three models for three different groupings of subreddits based on the number of
-subscribers of those subreddits. 
+three models for three different tiers of subreddits based on the number of
+subscribers of those subreddits ("popular", "kinda popular", "not-so-popular").. 
 
 I used a bag-of-words approach using [scikit-learn](http://scikit-learn.org/stable/)'s
 HashingVectorizer with 2<sup>18</sup> features and L1 normalization. The text of the title and
