@@ -2,8 +2,6 @@
 
 "reveal"
 
-[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
-
 [<img alt="View presentation on Google slides" src="screenshots/slides.png" width=400>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
 `r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
@@ -25,6 +23,8 @@ box lists communities related to posts the user is viewing.
 
 Install the Chrome extension from
 [the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
+
+[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
 text post from any subreddit or form
