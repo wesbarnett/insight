@@ -2,7 +2,7 @@
 
 "reveal"
 
-[<img alt="View presentation on Google slides" src="screenshots/slides.png" width=480>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
+[<img src="screenshots/slides.png" width=480>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
 [Google slides presentation](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
@@ -26,20 +26,22 @@ box lists communities related to posts the user is viewing.
 Install the Chrome extension from
 [the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
 
-[<img src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
+[<img src="screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
 After installing the Chrome extension simply visit Reddit and prepare to submit your
 text post from any subreddit or form
 [here](https://old.reddit.com/submit?selftext=true). While typing in your new
 submission, subreddits with similar content will show up below the input.
 
-[<img alt="Screenshot of submissions page" src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif" width=600>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif)
+[<img src="screenshots/record1.gif" width=600>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif)
 
 If you want to submit your content to one of those subreddits, click the link indicating
 the subreddit and a new window with your post content will popup where you can submit
 your content!
 
 Suggestions of similar communities of content you view will also be shown automatically.
+
+[<img src="screenshots/screenshot1.png" width=600>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/screenshot1.png)
 
 **Note:** The extension does not work on the redesigned Reddit interface. Ensure that
 the checkbox "Use the redesign as my default experience" is unchecked on your
