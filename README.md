@@ -31,7 +31,7 @@ text post from any subreddit or form
 [here](https://old.reddit.com/submit?selftext=true). While typing in your new
 submission, subreddits with similar content will show up below the input.
 
-[<img alt="Screenshot of submissions page" src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/recordl.gif" width=600>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif)
+[<img alt="Screenshot of submissions page" src="https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif" width=600>](https://raw.githubusercontent.com/wesbarnett/insight/master/screenshots/record1.gif)
 
 If you want to submit your content to one of those subreddits, click the link indicating
 the subreddit and a new window with your post content will popup where you can submit
