@@ -50,8 +50,7 @@ the checkbox "Use the redesign as my default experience" is unchecked on your
 There are some advanced options available to tune how many suggestions are displayed. By
 default, a maximum of 3 predictions are displayed per model for a total of 9 maximum
 predictions. There is also a threshold that limits the predictions, which can be
-adjusted. If you have the extension install, the options are
-[here](chrome-extension://kohjlglondmaajbicoflceolifjcicai/options.html).
+adjusted.
 
 ## About the models
 
