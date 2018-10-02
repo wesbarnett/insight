@@ -34,7 +34,7 @@ function handler() {
     }
 }
 
-var string = window.location.href,
+var string = window.location.href;
 substring0 = "submit";
 substring1 = "comments";
 
