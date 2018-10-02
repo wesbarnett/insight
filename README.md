@@ -43,6 +43,14 @@ Suggestions of similar communities of content you view will also be shown automa
 the checkbox "Use the redesign as my default experience" is unchecked on your
 [preferences page](https://www.reddit.com/prefs).
 
+### Options
+
+There are some advanced options available to tune how many suggestions are displayed. By
+default, a maximum of 3 predictions are displayed per model for a total of 9 maximum
+predictions. There is also a threshold that limits the predictions, which can be
+adjusted. If you have the extension install, the options are
+[here](chrome-extension://kohjlglondmaajbicoflceolifjcicai/options.html).
+
 ## About the models
 
 Supervised learning models were trained on subsets of the May 2018 Reddit data corpus
@@ -52,10 +60,11 @@ three models for three different tiers of subreddits based on the number of
 subscribers of those subreddits ("popular", "kinda popular", "not-so-popular").. 
 
 I used a bag-of-words approach using [scikit-learn](http://scikit-learn.org/stable/)'s
-HashingVectorizer with 2<sup>18</sup> features and L1 normalization. The text of the title and
-of the post itself were used in this feature vectorization. The subreddit names were
-used as the labels. I attempted using out-of-core Naive Bayes, but ran into memory usage
-when training, even on the reduced training sets. I also tried Logistic Regression with
-Stochastic Gradient Descent (SGD) but the resulting models took up several GB of disk
-space. In the end, SGD with Support Vector Machine was used for classifying the posts in
-all of the models due to its fast predictions and low disk space.
+HashingVectorizer with 2<sup>18</sup> features and L1 normalization of the word counts
+(that is, word frequencies were used). The text of the title and of the post itself were
+used in this feature vectorization. The subreddit names were used as the labels. I
+attempted using out-of-core Naive Bayes, but ran into memory usage when training, even
+on the reduced training sets. I also tried Logistic Regression with Stochastic Gradient
+Descent (SGD) but the resulting models took up several GB of disk space. In the end, SGD
+with Support Vector Machine was used for classifying the posts in all of the models due
+to its low latency in predicting and low disk space.
