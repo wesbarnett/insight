@@ -2,7 +2,7 @@
 
 "reveal"
 
-[<img align="center" alt="View presentation on Google slides" src="screenshots/slides.png" width=480>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
+[<img style="text-align: center;" alt="View presentation on Google slides" src="screenshots/slides.png" width=480>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
 [Google slides presentation](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
