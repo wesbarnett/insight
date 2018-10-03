@@ -20,24 +20,6 @@ import time
 import json
 time.ctime()
 
-class redditSGDModel:
-
-    def __init__(self, engine, model):
-
-        self.cv_chunks = model["cv_chunks"]
-        self.chunksize = model["chunksize"]
-        self.table_name = model["table_name"]
-        self.subscribers_ulimit = model["subscribers_ulimit"]
-        self.subscribers_llimit = model["subscribers_llimit"]
-
-        self.vectorizer = HashingVectorizer(
-            decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-            alternate_sign=False, norm="l1", stop_words="english"
-        )
-
-        self.engine = engine
-
-
 def parse_data_chunk(chunk, vectorizer):
     """
     Parses the information in the pandas Dataframe chunk and vectorizes it for use with
@@ -156,8 +138,19 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
     return score_avg
 
 def grid_search(engine, alpha_range, model, vectorizer, classes, f):
+    """
+    Performs grid search on the data set, holding out the validation and test sets.
 
-    # Grid search
+    engine : sqlalchemy connection to database
+    alpha_range : list, range of alpha parameters to test
+    model : model parameters from configuration file
+    vectorizer : vectorizer for featurizing text and title
+    classes : all possible classes
+    f : connection to log file
+
+    Returns the best regularization parameter.
+    """
+
     best_score = 0.
     f.write("Training models...\n")
     f.flush()
@@ -210,6 +203,18 @@ def get_classes(engine, model):
     return classes
 
 def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
+    """
+    Trains the model on the entire training set.
+
+    engine : sqlalchemy connection to database
+    best_alpha : the regularization parameter chosen from grid search
+    model : model parameters from configuration file
+    vectorizer : vectorizer for featurizing text and title
+    classes : all possible classes
+    f : connection to log file
+
+    Returns the trained sklearn model.
+    """
 
     chunksize = model["chunksize"]
     table_name = model["table_name"]
@@ -239,6 +244,18 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     return sgd
 
 def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
+    """
+    Trains the model on just the training set.
+
+    engine : sqlalchemy connection to database
+    best_alpha : the regularization parameter chosen from grid search
+    model : model parameters from configuration file
+    vectorizer : vectorizer for featurizing text and title
+    classes : all possible classes
+    f : connection to log file
+
+    Returns the trained sklearn model.
+    """
 
     chunksize = model["chunksize"]
     table_name = model["table_name"]
@@ -277,7 +294,6 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
         del X_train
         del y_train
 
-
 if __name__ == "__main__":
 
     db_user = "wes"
@@ -303,17 +319,21 @@ if __name__ == "__main__":
             alternate_sign=False, norm="l1", stop_words="english"
         )
 
+        # Get possible classes (subreddits)
         classes = get_classes(engine, model)
         f.write(f"Number of classes: {classes.shape[0]}\n")
         f.flush()
 
+        # Do grid search
         alpha_range = np.logspace(-7,-3,5)
         best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, f)
 
+        # Train on training set and test on hold out test set
         sgd_train = train_train_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd_train.sparsify(), model["train_outfile"])
         del sgd_train
         
+        # Train on entire data set
         sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd.sparsify(), model["outfile"])
         del sgd
