@@ -20,6 +20,24 @@ import time
 import json
 time.ctime()
 
+class redditSGDModel:
+
+    def __init__(self, engine, model):
+
+        self.cv_chunks = model["cv_chunks"]
+        self.chunksize = model["chunksize"]
+        self.table_name = model["table_name"]
+        self.subscribers_ulimit = model["subscribers_ulimit"]
+        self.subscribers_llimit = model["subscribers_llimit"]
+
+        self.vectorizer = HashingVectorizer(
+            decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
+            alternate_sign=False, norm="l1", stop_words="english"
+        )
+
+        self.engine = engine
+
+
 def parse_data_chunk(chunk, vectorizer):
     """
     Parses the information in the pandas Dataframe chunk and vectorizes it for use with
@@ -37,7 +55,7 @@ def parse_data_chunk(chunk, vectorizer):
     X = vectorizer.transform(X)
     return X, y
 
-def train_val_model(engine, alpha, model, vectorizer, f):
+def train_val_model(engine, alpha, model, vectorizer, classes, f):
     """
     Trains a linear SVM using stochastic gradient descent using the data in the SQL
     table specified. The test set and the validation set are skipped in this function.
@@ -137,6 +155,28 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
 
     return score_avg
 
+def grid_search(engine, alpha_range, model, vectorizer, classes, f):
+
+    # Grid search
+    best_score = 0.
+    f.write("Training models...\n")
+    f.flush()
+    for alpha in alpha_range:
+
+        sgd_cv = train_val_model(engine, alpha, model, vectorizer, classes, f)
+        score = eval_val_model(sgd_cv, engine, model, vectorizer, classes, f)
+        if score > best_score:
+            best_score = score
+            best_alpha = alpha
+
+    f.write(f"best alpha = {best_alpha}\n")
+    f.write(f"best val score= {best_score}\n")
+    f.flush()
+
+    del sgd_cv
+
+    return best_alpha
+
 def get_classes(engine, model):
     """
     Gets the number of classes in a grouping for subreddits based on the number of
@@ -169,7 +209,7 @@ def get_classes(engine, model):
 
     return classes
 
-def train_all_data(engine, best_alpha, model, vectorizer, f):
+def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
 
     chunksize = model["chunksize"]
     table_name = model["table_name"]
@@ -198,7 +238,7 @@ def train_all_data(engine, best_alpha, model, vectorizer, f):
 
     return sgd
 
-def train_train_data(engine, best_alpha, model, vectorizer, f):
+def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
 
     chunksize = model["chunksize"]
     table_name = model["table_name"]
@@ -237,6 +277,7 @@ def train_train_data(engine, best_alpha, model, vectorizer, f):
         del X_train
         del y_train
 
+
 if __name__ == "__main__":
 
     db_user = "wes"
@@ -253,45 +294,27 @@ if __name__ == "__main__":
     f.write(time.ctime())
     f.write('\n')
 
-    vectorizer = HashingVectorizer(
-        decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-        alternate_sign=False, norm="l1", stop_words="english"
-    )
-
     engine = sqlalchemy.create_engine(f"postgresql://{db_user}@localhost/{db_name}")
 
     for key, model in models.items():
 
-        chunksize = model["chunksize"]
-        table_name = model["table_name"]
+        vectorizer = HashingVectorizer(
+            decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
+            alternate_sign=False, norm="l1", stop_words="english"
+        )
 
         classes = get_classes(engine, model)
         f.write(f"Number of classes: {classes.shape[0]}\n")
         f.flush()
 
-        # Grid search
-        best_score = 0.
-        f.write("Training models...\n")
-        f.flush()
-        for alpha in np.logspace(-7,-3,5):
+        alpha_range = np.logspace(-7,-3,5)
+        best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, f)
 
-            sgd_cv = train_val_model(engine, alpha, model, vectorizer, f)
-            score = eval_val_model(sgd_cv, engine, model, vectorizer, f)
-            if score > best_score:
-                best_score = score
-                best_alpha = alpha
-
-        f.write(f"best alpha = {best_alpha}\n")
-        f.write(f"best val score= {best_score}\n")
-        f.flush()
-
-        del sgd_cv
-
-        sgd_train = train_train_data(engine, best_alpha, model, vectorizer, f)
+        sgd_train = train_train_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd_train.sparsify(), model["train_outfile"])
         del sgd_train
         
-        sgd = train_all_data(engine, best_alpha, model, vectorizer, f)
+        sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd.sparsify(), model["outfile"])
         del sgd
 
