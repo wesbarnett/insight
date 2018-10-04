@@ -1,12 +1,12 @@
 {
     "large" : {
-        "subscribers_ulimit": "None", 
+        "subscribers_ulimit": null, 
         "subscribers_llimit": 1.3e5, 
         "cv_chunks": 1,
         "chunksize": 7e4, 
         "table_name": "submissions_0", 
-        "outfile": "MODELS/sgd_svm_large.gz", 
-        "train_outfile": "MODELS/sgd_svm_train_large.gz"
+        "outfile": "TEST/sgd_svm_large.gz", 
+        "train_outfile": "TEST/sgd_svm_train_large.gz"
         },
 
     "med" : {
@@ -15,8 +15,8 @@
         "cv_chunks": 1,
         "chunksize": 4e4, 
         "table_name": "submissions_1", 
-        "outfile": "MODELS/sgd_svm_med.gz", 
-        "train_outfile": "MODELS/sgd_svm_train_med.gz"
+        "outfile": "TEST/sgd_svm_med.gz", 
+        "train_outfile": "TEST/sgd_svm_train_med.gz"
         },
 
     "small" : {
@@ -25,7 +25,7 @@
         "cv_chunks": 1,
         "chunksize": 2e4,
         "table_name": "submissions_2", 
-        "outfile": "MODELS/sgd_svm_small.gz", 
-        "train_outfile": "MODELS/sgd_svm_train_small.gz"
+        "outfile": "TEST/sgd_svm_small.gz", 
+        "train_outfile": "TEST/sgd_svm_train_small.gz"
         }
 }
