@@ -15,6 +15,8 @@
         "scripts": ["background.js"]
     },
 	"permissions": [
-    	"storage"
+    	"storage",
+        "https://insight.barnett.science/api/*",
+        "https://*.reddit.com/*"
 	]
 }
