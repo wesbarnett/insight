@@ -7,6 +7,7 @@ from string import punctuation
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 
+
 def process_text(txt):
     """Processes text in preparation for word stemming. Specifically it makes all
     letters lowercase, removes line breaks and tabs, and converts numbers, urls, email
@@ -60,6 +61,6 @@ def stemmed_words(doc):
     """
     doc = process_text(doc)
     stemmer = PorterStemmer()
-    analyzer = CountVectorizer(decode_error='ignore').build_analyzer()
+    analyzer = CountVectorizer(decode_error="ignore").build_analyzer()
     tokens = (stemmer.stem(w) for w in analyzer(doc))
     return tokens
