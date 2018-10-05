@@ -1,8 +1,4 @@
-# r/eveal
-
-"reveal"
-
-[<img src="screenshots/slides.png" width=480>](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
+<img src="logos/reveal.png" width=480>
 
 [Google slides presentation](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
 
