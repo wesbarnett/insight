@@ -12,13 +12,11 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import f1_score
 import sqlalchemy
 
 import nlp_scripts
-import sql_scripts
+
 
 def parse_data_chunk(chunk, vectorizer):
     """Parses the information in the pandas Dataframe chunk and vectorizes it for use with
@@ -26,7 +24,7 @@ def parse_data_chunk(chunk, vectorizer):
 
     Parameters
     ----------
-    chunk : pandas Dataframe 
+    chunk : pandas Dataframe
         Chunk from generator read in from SQL database.
     vectorizer : sklearn HashingVectorizer object
         The vectorizer to be used for featurization.
@@ -43,6 +41,7 @@ def parse_data_chunk(chunk, vectorizer):
     y = chunk["subreddit"]
     X = vectorizer.transform(X)
     return X, y
+
 
 def train_val_model(engine, alpha, model, vectorizer, classes, f):
     """Trains a linear SVM using stochastic gradient descent using the data in the SQL
@@ -68,16 +67,18 @@ def train_val_model(engine, alpha, model, vectorizer, classes, f):
     chunksize = model["chunksize"]
     table_name = model["table_name"]
 
-    sgd_cv = SGDClassifier(alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3,
-            random_state=0)
+    sgd_cv = SGDClassifier(
+        alpha=alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
+    )
 
     # "by index" is very important such that we always skip the same test and validation
     # sets.
-    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
-            chunksize=chunksize)
+    df = pd.read_sql(
+        f"select * from {table_name} order by index;", engine, chunksize=chunksize
+    )
 
     # Skip hold out test set and validation set
-    for i in range(cv_chunks*2):
+    for i in range(cv_chunks * 2):
         chunk = next(df)
         print(chunk.iloc[0])
         del chunk
@@ -97,6 +98,7 @@ def train_val_model(engine, alpha, model, vectorizer, classes, f):
         del y_train
 
     return sgd_cv
+
 
 def eval_val_model(sgd_cv, engine, model, vectorizer, f):
     """Evaluates the model that was trained using 'train_val_model'. Skips the test set,
@@ -124,8 +126,9 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
     table_name = model["table_name"]
 
     # Re-read from beginning of table
-    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
-            chunksize=chunksize)
+    df = pd.read_sql(
+        f"select * from {table_name} order by index;", engine, chunksize=chunksize
+    )
 
     # Skip hold out test set
     for j in range(cv_chunks):
@@ -144,7 +147,7 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
 
         score = sgd_cv.score(X_val, y_val)
         f.write(f"accuracy = {score}\n")
-        score = f1_score(y_val, sgd_cv.predict(X_val), average='weighted')
+        score = f1_score(y_val, sgd_cv.predict(X_val), average="weighted")
         f.write(f"f1 score = {score}\n")
         del X_val
         del y_val
@@ -158,6 +161,7 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
     f.flush()
 
     return score_avg
+
 
 def grid_search(engine, alpha_range, model, vectorizer, classes, f):
     """ Performs grid search on the data set, holding out the validation and test sets.
@@ -200,6 +204,7 @@ def grid_search(engine, alpha_range, model, vectorizer, classes, f):
 
     return best_alpha
 
+
 def get_classes(engine, model):
     """Gets the number of classes in a grouping for subreddits based on the number of
     subscribers.
@@ -219,23 +224,24 @@ def get_classes(engine, model):
     subscribers_ulimit = model["subscribers_ulimit"]
     subscribers_llimit = model["subscribers_llimit"]
 
-    if subscribers_ulimit == None:
+    if subscribers_ulimit is None:
         classes = pd.read_sql(
             f"""
-            select display_name from subreddits 
+            select display_name from subreddits
             where subscribers > {subscribers_llimit};""",
             engine,
         )
     else:
         classes = pd.read_sql(
             f"""
-            select display_name from subreddits 
+            select display_name from subreddits
             where subscribers <= {subscribers_ulimit}
             and subscribers > {subscribers_llimit};""",
             engine,
         )
 
     return classes
+
 
 def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     """Trains the model on the entire training set.
@@ -259,13 +265,15 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     table_name = model["table_name"]
 
     # Entire data set
-    sgd = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
-            random_state=0)
+    sgd = SGDClassifier(
+        alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
+    )
     f.write("Performing training on entire data set...\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
-            chunksize=chunksize)
+    df = pd.read_sql(
+        f"select * from {table_name} order by index;", engine, chunksize=chunksize
+    )
 
     j = 0
     for chunk in df:
@@ -281,6 +289,7 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
         del y
 
     return sgd
+
 
 def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
     """Trains the model on just the training set.
@@ -306,13 +315,15 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
     f.write("Performing training on entire training set...\n")
     f.flush()
 
-    df = pd.read_sql(f"select * from {table_name} order by index;", engine,
-            chunksize=chunksize)
+    df = pd.read_sql(
+        f"select * from {table_name} order by index;", engine, chunksize=chunksize
+    )
 
-    sgd_train = SGDClassifier(alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3,
-            random_state=0)
+    sgd_train = SGDClassifier(
+        alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
+    )
 
-    chunk = next(df) # Skip hold out test set
+    chunk = next(df)  # Skip hold out test set
     print(chunk.iloc[0])
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
@@ -326,9 +337,11 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
         sgd_train.partial_fit(X_train, y_train, classes)
 
         train_score = sgd_train.score(X_train, y_train)
-        train_f1_score = f1_score(y_train, sgd_train.predict(X_train), average='weighted')
+        train_f1_score = f1_score(
+            y_train, sgd_train.predict(X_train), average="weighted"
+        )
         test_score = sgd_train.score(X_test, y_test)
-        test_f1_score = f1_score(y_test, sgd_train.predict(X_test), average='weighted')
+        test_f1_score = f1_score(y_test, sgd_train.predict(X_test), average="weighted")
 
         i += chunk.shape[0]
         f.write(f"{i} {train_score} {test_score} {train_f1_score} {test_f1_score}\n")
@@ -338,6 +351,7 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
         del y_train
 
     return sgd_train
+
 
 if __name__ == "__main__":
 
@@ -351,17 +365,21 @@ if __name__ == "__main__":
         models = json.load(jsonfile)
 
     f = open(logfile, "a")
-    f.write('\n')
+    f.write("\n")
     f.write(time.ctime())
-    f.write('\n')
+    f.write("\n")
 
     engine = sqlalchemy.create_engine(f"postgresql://{db_user}@localhost/{db_name}")
 
     for key, model in models.items():
 
         vectorizer = HashingVectorizer(
-            decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
-            alternate_sign=False, norm="l1", stop_words="english"
+            decode_error="ignore",
+            analyzer=nlp_scripts.stemmed_words,
+            n_features=2 ** 18,
+            alternate_sign=False,
+            norm="l1",
+            stop_words="english",
         )
 
         # Get possible classes (subreddits)
@@ -370,14 +388,14 @@ if __name__ == "__main__":
         f.flush()
 
         # Do grid search
-        alpha_range = np.logspace(-7,-3,5)
+        alpha_range = np.logspace(-7, -3, 5)
         best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, f)
 
         # Train on training set and test on hold out test set
         sgd_train = train_train_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd_train.sparsify(), model["train_outfile"])
         del sgd_train
-        
+
         # Train on entire data set
         sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
         dump(sgd.sparsify(), model["outfile"])
