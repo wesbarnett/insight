@@ -291,7 +291,7 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     return sgd
 
 
-def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
+def train_training_data(engine, best_alpha, model, vectorizer, classes, f):
     """Trains the model on just the training set.
 
     Parameters
@@ -352,6 +352,16 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
 
     return sgd_train
 
+def train_training_data_dump(engine, best_alpha, model, vectorizer, classes, f):
+
+    # Train on training set and test on hold out test set
+    sgd_train = train_training_data(engine, best_alpha, model, vectorizer, classes, f)
+    dump(sgd_train.sparsify(), model["train_outfile"])
+
+def train_all_data_dump(engine, best_alpha, model, vectorizer, classes, f):
+
+    sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
+    dump(sgd.sparsify(), model["outfile"])
 
 if __name__ == "__main__":
 
@@ -391,15 +401,9 @@ if __name__ == "__main__":
         alpha_range = np.logspace(-7, -3, 5)
         best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, f)
 
-        # Train on training set and test on hold out test set
-        sgd_train = train_train_data(engine, best_alpha, model, vectorizer, classes, f)
-        dump(sgd_train.sparsify(), model["train_outfile"])
-        del sgd_train
+        train_training_data_dump(engine, best_alpha, model, vectorizer, classes, f)
 
-        # Train on entire data set
-        sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
-        dump(sgd.sparsify(), model["outfile"])
-        del sgd
+        train_all_data_dump(engine, best_alpha, model, vectorizer, classes, f)
 
     engine.dispose()
 
