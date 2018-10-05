@@ -21,33 +21,47 @@ import nlp_scripts
 import sql_scripts
 
 def parse_data_chunk(chunk, vectorizer):
-    """
-    Parses the information in the pandas Dataframe chunk and vectorizes it for use with
+    """Parses the information in the pandas Dataframe chunk and vectorizes it for use with
     sklearn models.
 
-    chunk : pandas Dataframe chunk from generator
-    vectorizer : the vectorizer to be used for featurization
+    Parameters
+    ----------
+    chunk : pandas Dataframe 
+        Chunk from generator read in from SQL database.
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
 
-    Returns the features (X) and the labels (y).
+    Return
+    ------
+    X : scipy.sparse matrix, shape = (chunk.shape[0], self.n_features)
+        Document-term matrix.
+    y : pandas Series
+        Class labels.
     """
 
     X = chunk["title"] + " " + chunk["selftext"]
     y = chunk["subreddit"]
-    del chunk
     X = vectorizer.transform(X)
     return X, y
 
 def train_val_model(engine, alpha, model, vectorizer, classes, f):
-    """
-    Trains a linear SVM using stochastic gradient descent using the data in the SQL
+    """Trains a linear SVM using stochastic gradient descent using the data in the SQL
     table specified. The test set and the validation set are skipped in this function.
 
+    Parameters
+    ----------
     engine : sqlalchemy connection to database
-    alpha : the regularization parameter
-    model : model parameters from configuration file
+    alpha : float
+        The regularization parameter.
+    model : dictionary
+        Model parameters from configuration file.
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
     f : connection to log file
 
-    Returns the trained sklearn model.
+    Returns
+    -------
+    sgd_cv : sklearn SGDClassifier model.
     """
 
     cv_chunks = model["cv_chunks"]
@@ -85,16 +99,24 @@ def train_val_model(engine, alpha, model, vectorizer, classes, f):
     return sgd_cv
 
 def eval_val_model(sgd_cv, engine, model, vectorizer, f):
-    """
-    Evaluates the model that was trained using 'train_val_model'. Skips the test set,
+    """Evaluates the model that was trained using 'train_val_model'. Skips the test set,
     but reads in the validation set for evaluation.
 
-    sgd_cv : sklearn model trained with 'train_val_model'
+    Parameters
+    ----------
+    sgd_cv : sklearn SGDClassifier object
+        model trained with 'train_val_model'
     engine : sqlalchemy connection to database
-    model : model parameters from configuration file
+    model : dictionary
+        Model parameters from configuration file.
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
     f : connection to log file
 
-    Returns the score.
+    Returns
+    -------
+    score_avg : float
+        Average score of model on validation set.
     """
 
     cv_chunks = model["cv_chunks"]
@@ -138,17 +160,25 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
     return score_avg
 
 def grid_search(engine, alpha_range, model, vectorizer, classes, f):
-    """
-    Performs grid search on the data set, holding out the validation and test sets.
+    """ Performs grid search on the data set, holding out the validation and test sets.
 
+    Parameters
+    ----------
     engine : sqlalchemy connection to database
-    alpha_range : list, range of alpha parameters to test
-    model : model parameters from configuration file
-    vectorizer : vectorizer for featurizing text and title
-    classes : all possible classes
+    alpha_range : list of floats
+        Range of regularization parameters to test.
+    model : dictionary
+        Model parameters from configuration file.
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
+    classes : pandas Series
+        All possible classes in this subset.
     f : connection to log file
 
-    Returns the best regularization parameter.
+    Returns
+    -------
+    best_alpha : float
+        The best regularization parameter based on validation set performance.
     """
 
     best_score = 0.
@@ -171,14 +201,19 @@ def grid_search(engine, alpha_range, model, vectorizer, classes, f):
     return best_alpha
 
 def get_classes(engine, model):
-    """
-    Gets the number of classes in a grouping for subreddits based on the number of
+    """Gets the number of classes in a grouping for subreddits based on the number of
     subscribers.
 
+    Parameters
+    ----------
     engine : sqlalchemy connection to database
-    model : model read in from configuration file
+    model : dictionary
+        Model parameters from configuration file.
 
-    Return number of classes.
+    Returns
+    -------
+    classes : pandas Series
+        List of classes in subset of data.
     """
 
     subscribers_ulimit = model["subscribers_ulimit"]
@@ -203,17 +238,21 @@ def get_classes(engine, model):
     return classes
 
 def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
-    """
-    Trains the model on the entire training set.
+    """Trains the model on the entire training set.
 
+    Parameters
+    ----------
     engine : sqlalchemy connection to database
     best_alpha : the regularization parameter chosen from grid search
     model : model parameters from configuration file
-    vectorizer : vectorizer for featurizing text and title
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
     classes : all possible classes
     f : connection to log file
 
-    Returns the trained sklearn model.
+    Returns
+    -------
+    sgd : sklearn SGDClassifier model.
     """
 
     chunksize = model["chunksize"]
@@ -244,17 +283,21 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     return sgd
 
 def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
-    """
-    Trains the model on just the training set.
+    """Trains the model on just the training set.
 
+    Parameters
+    ----------
     engine : sqlalchemy connection to database
     best_alpha : the regularization parameter chosen from grid search
     model : model parameters from configuration file
-    vectorizer : vectorizer for featurizing text and title
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
     classes : all possible classes
     f : connection to log file
 
-    Returns the trained sklearn model.
+    Returns
+    -------
+    sgd_train : sklearn SGDClassifier model.
     """
 
     chunksize = model["chunksize"]
@@ -293,6 +336,8 @@ def train_train_data(engine, best_alpha, model, vectorizer, classes, f):
 
         del X_train
         del y_train
+
+    return sgd_train
 
 if __name__ == "__main__":
 
