@@ -24,8 +24,8 @@ Install the Chrome extension from
 
 [<img src="screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
 
-After installing the Chrome extension simply visit Reddit and prepare to submit your
-text post from any subreddit or form
+After installing the Chrome extension simply visit [Reddit](https://reddit.com) and prepare to submit your
+text post from any subreddit or from
 [here](https://old.reddit.com/submit?selftext=true). While typing in your new
 submission, subreddits with similar content will show up below the input.
 
