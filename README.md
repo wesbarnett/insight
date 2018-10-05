@@ -5,8 +5,8 @@
 `r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
  
-Reddit is a social media site where users engage in discussions in communities call
-subreddits, often denoted by `r/*community_name*`. However, it's difficult to weed
+Reddit is a social media site where users engage in discussions in communities called
+subreddits, often prefixed with `r/`. However, it's difficult to weed
 through all of the 130,000+ active subreddits out there and find new communities other
 than the most popular ones. Additionally many subreddits have strict moderation and
 rules on what content they accept. Mods waste a lot of time removing posts and users can
