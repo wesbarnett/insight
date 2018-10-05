@@ -4,21 +4,21 @@
 
 # Author : Wes Barnett
 
-import nlp_scripts
+import time
+import json
+
+from joblib import dump
 import numpy as np
 import pandas as pd
-from joblib import dump
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import f1_score
-from datetime import date, time
 import sqlalchemy
+
+import nlp_scripts
 import sql_scripts
-import time
-import json
-time.ctime()
 
 def parse_data_chunk(chunk, vectorizer):
     """
