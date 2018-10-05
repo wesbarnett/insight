@@ -43,7 +43,7 @@ def parse_data_chunk(chunk, vectorizer):
     return X, y
 
 
-def train_val_model(engine, alpha, model, vectorizer, classes, f):
+def train_val_model(engine, alpha, model, vectorizer, classes, logfile_object):
     """Trains a linear SVM using stochastic gradient descent using the data in the SQL
     table specified. The test set and the validation set are skipped in this function.
 
@@ -79,28 +79,24 @@ def train_val_model(engine, alpha, model, vectorizer, classes, f):
 
     # Skip hold out test set and validation set
     for i in range(cv_chunks * 2):
-        chunk = next(df)
+        chunk = next(dlogfile_object)
         print(chunk.iloc[0])
-        del chunk
 
     j = 0
     for chunk in df:
 
         j += chunk.shape[0]
-        f.write(f"{j}\n")
-        f.flush()
+        logfile_object.write(f"{j}\n")
+        logfile_object.flush()
 
         X_train, y_train = parse_data_chunk(chunk, vectorizer)
 
         sgd_cv.partial_fit(X_train, y_train, classes)
 
-        del X_train
-        del y_train
-
     return sgd_cv
 
 
-def eval_val_model(sgd_cv, engine, model, vectorizer, f):
+def eval_val_model(sgd_cv, engine, model, vectorizer, logfile_object):
     """Evaluates the model that was trained using 'train_val_model'. Skips the test set,
     but reads in the validation set for evaluation.
 
@@ -132,38 +128,35 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, f):
 
     # Skip hold out test set
     for j in range(cv_chunks):
-        chunk = next(df)
-        del chunk
+        chunk = next(dlogfile_object)
 
     # Validation set scoring
-    f.write("Calculating validation score...\n")
-    f.flush()
+    logfile_object.write("Calculating validation score...\n")
+    logfile_object.flush()
     score_avg = 0.
     for chunk in range(cv_chunks):
 
-        chunk = next(df)
+        chunk = next(dlogfile_object)
 
         X_val, y_val = parse_data_chunk(chunk, vectorizer)
 
         score = sgd_cv.score(X_val, y_val)
-        f.write(f"accuracy = {score}\n")
+        logfile_object.write(f"accuracy = {score}\n")
         score = f1_score(y_val, sgd_cv.predict(X_val), average="weighted")
-        f.write(f"f1 score = {score}\n")
-        del X_val
-        del y_val
+        logfile_object.write(f"f1 score = {score}\n")
 
         score_avg += score
 
     score_avg /= cv_chunks
 
-    f.write(f"alpha = {alpha}\n")
-    f.write(f"val score = {score_avg}\n")
-    f.flush()
+    logfile_object.write(f"alpha = {alpha}\n")
+    logfile_object.write(f"val score = {score_avg}\n")
+    logfile_object.flush()
 
     return score_avg
 
 
-def grid_search(engine, alpha_range, model, vectorizer, classes, f):
+def grid_search(engine, alpha_range, model, vectorizer, classes, logfile_object):
     """ Performs grid search on the data set, holding out the validation and test sets.
 
     Parameters
@@ -186,21 +179,19 @@ def grid_search(engine, alpha_range, model, vectorizer, classes, f):
     """
 
     best_score = 0.
-    f.write("Training models...\n")
-    f.flush()
+    logfile_object.write("Training models...\n")
+    logfile_object.flush()
     for alpha in alpha_range:
 
-        sgd_cv = train_val_model(engine, alpha, model, vectorizer, classes, f)
-        score = eval_val_model(sgd_cv, engine, model, vectorizer, classes, f)
+        sgd_cv = train_val_model(engine, alpha, model, vectorizer, classes, logfile_object)
+        score = eval_val_model(sgd_cv, engine, model, vectorizer, classes, logfile_object)
         if score > best_score:
             best_score = score
             best_alpha = alpha
 
-    f.write(f"best alpha = {best_alpha}\n")
-    f.write(f"best val score= {best_score}\n")
-    f.flush()
-
-    del sgd_cv
+    logfile_object.write(f"best alpha = {best_alpha}\n")
+    logfile_object.write(f"best val score= {best_score}\n")
+    logfile_object.flush()
 
     return best_alpha
 
@@ -243,7 +234,7 @@ def get_classes(engine, model):
     return classes
 
 
-def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
+def train_all_data(engine, best_alpha, model, vectorizer, classes, logfile_object):
     """Trains the model on the entire training set.
 
     Parameters
@@ -268,8 +259,8 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     sgd = SGDClassifier(
         alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
     )
-    f.write("Performing training on entire data set...\n")
-    f.flush()
+    logfile_object.write("Performing training on entire data set...\n")
+    logfile_object.flush()
 
     df = pd.read_sql(
         f"select * from {table_name} order by index;", engine, chunksize=chunksize
@@ -279,19 +270,16 @@ def train_all_data(engine, best_alpha, model, vectorizer, classes, f):
     for chunk in df:
 
         j += chunk.shape[0]
-        f.write(f"{j}\n")
-        f.flush()
+        logfile_object.write(f"{j}\n")
+        logfile_object.flush()
 
         X, y = parse_data_chunk(chunk, vectorizer)
         sgd.partial_fit(X, y, classes)
 
-        del X
-        del y
-
     return sgd
 
 
-def train_training_data(engine, best_alpha, model, vectorizer, classes, f):
+def train_training_data(engine, best_alpha, model, vectorizer, classes, logfile_object):
     """Trains the model on just the training set.
 
     Parameters
@@ -312,8 +300,8 @@ def train_training_data(engine, best_alpha, model, vectorizer, classes, f):
     chunksize = model["chunksize"]
     table_name = model["table_name"]
 
-    f.write("Performing training on entire training set...\n")
-    f.flush()
+    logfile_object.write("Performing training on entire training set...\n")
+    logfile_object.flush()
 
     df = pd.read_sql(
         f"select * from {table_name} order by index;", engine, chunksize=chunksize
@@ -323,12 +311,12 @@ def train_training_data(engine, best_alpha, model, vectorizer, classes, f):
         alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
     )
 
-    chunk = next(df)  # Skip hold out test set
+    chunk = next(dlogfile_object)  # Skip hold out test set
     print(chunk.iloc[0])
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
-    f.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
-    f.flush()
+    logfile_object.write(f"N  train_score test_score train_f1_Score test_f1_score\n")
+    logfile_object.flush()
 
     i = 0
     for chunk in df:
@@ -344,24 +332,47 @@ def train_training_data(engine, best_alpha, model, vectorizer, classes, f):
         test_f1_score = f1_score(y_test, sgd_train.predict(X_test), average="weighted")
 
         i += chunk.shape[0]
-        f.write(f"{i} {train_score} {test_score} {train_f1_score} {test_f1_score}\n")
-        f.flush()
-
-        del X_train
-        del y_train
+        logfile_object.write(f"{i} {train_score} {test_score} {train_f1_score} {test_f1_score}\n")
+        logfile_object.flush()
 
     return sgd_train
 
-def train_training_data_dump(engine, best_alpha, model, vectorizer, classes, f):
 
-    # Train on training set and test on hold out test set
-    sgd_train = train_training_data(engine, best_alpha, model, vectorizer, classes, f)
+def train_training_data_dump(engine, best_alpha, model, vectorizer, classes, logfile_object):
+    """Trains the model on just the training set and saves to disk.
+
+    Parameters
+    ----------
+    engine : sqlalchemy connection to database
+    best_alpha : the regularization parameter chosen from grid search
+    model : model parameters from configuration file
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
+    classes : all possible classes
+    f : connection to log file
+    """
+
+    sgd_train = train_training_data(engine, best_alpha, model, vectorizer, classes, logfile_object)
     dump(sgd_train.sparsify(), model["train_outfile"])
 
-def train_all_data_dump(engine, best_alpha, model, vectorizer, classes, f):
 
-    sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, f)
+def train_all_data_dump(engine, best_alpha, model, vectorizer, classes, logfile_object):
+    """Trains the model on the entire training set and saves to disk.
+
+    Parameters
+    ----------
+    engine : sqlalchemy connection to database
+    best_alpha : the regularization parameter chosen from grid search
+    model : model parameters from configuration file
+    vectorizer : sklearn HashingVectorizer object
+        The vectorizer to be used for featurization.
+    classes : all possible classes
+    f : connection to log file
+    """
+
+    sgd = train_all_data(engine, best_alpha, model, vectorizer, classes, logfile_object)
     dump(sgd.sparsify(), model["outfile"])
+
 
 if __name__ == "__main__":
 
@@ -374,10 +385,10 @@ if __name__ == "__main__":
     with open(json_config) as jsonfile:
         models = json.load(jsonfile)
 
-    f = open(logfile, "a")
-    f.write("\n")
-    f.write(time.ctime())
-    f.write("\n")
+    logfile_object = open(logfile, "a")
+    logfile_object.write("\n")
+    logfile_object.write(time.ctime())
+    logfile_object.write("\n")
 
     engine = sqlalchemy.create_engine(f"postgresql://{db_user}@localhost/{db_name}")
 
@@ -394,17 +405,17 @@ if __name__ == "__main__":
 
         # Get possible classes (subreddits)
         classes = get_classes(engine, model)
-        f.write(f"Number of classes: {classes.shape[0]}\n")
-        f.flush()
+        logfile_object.write(f"Number of classes: {classes.shape[0]}\n")
+        logfile_object.flush()
 
         # Do grid search
         alpha_range = np.logspace(-7, -3, 5)
-        best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, f)
+        best_alpha = grid_search(engine, alpha_range, model, vectorizer, classes, logfile_object)
 
-        train_training_data_dump(engine, best_alpha, model, vectorizer, classes, f)
+        train_training_data_dump(engine, best_alpha, model, vectorizer, classes, logfile_object)
 
-        train_all_data_dump(engine, best_alpha, model, vectorizer, classes, f)
+        train_all_data_dump(engine, best_alpha, model, vectorizer, classes, logfile_object)
 
     engine.dispose()
 
-    f.close()
+    logfile_object.close()
