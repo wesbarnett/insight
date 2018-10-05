@@ -1,0 +1,31 @@
+{
+    "large" : {
+        "subscribers_ulimit": null, 
+        "subscribers_llimit": 1.3e5, 
+        "cv_chunks": 1,
+        "chunksize": 7e4, 
+        "table_name": "submissions_0", 
+        "outfile": "TEST/sgd_svm_large.gz", 
+        "train_outfile": "TEST/sgd_svm_train_large.gz"
+        },
+
+    "med" : {
+        "subscribers_ulimit": 1.3e5, 
+        "subscribers_llimit": 5.5e4, 
+        "cv_chunks": 1,
+        "chunksize": 4e4, 
+        "table_name": "submissions_1", 
+        "outfile": "TEST/sgd_svm_med.gz", 
+        "train_outfile": "TEST/sgd_svm_train_med.gz"
+        },
+
+    "small" : {
+        "subscribers_ulimit": 5.5e4, 
+        "subscribers_llimit": 3.3e4, 
+        "cv_chunks": 1,
+        "chunksize": 2e4,
+        "table_name": "submissions_2", 
+        "outfile": "TEST/sgd_svm_small.gz", 
+        "train_outfile": "TEST/sgd_svm_train_small.gz"
+        }
+}

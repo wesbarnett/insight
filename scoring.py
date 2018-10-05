@@ -5,6 +5,7 @@ from joblib import load
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import precision_recall_fscore_support
 import sqlalchemy
 import sql_scripts
 
@@ -33,7 +34,7 @@ model_small = {"subscribers_ulimit": 5.5e4, "subscribers_llimit": 3.3e4, "cv_chu
         "MODELS/sgd_svm_small.gz", "train_outfile": "MODELS/sgd_svm_train_small.gz"
         }
 
-models = [model_large]
+models = [model_small, model_med, model_large]
 
 vectorizer = HashingVectorizer(
     decode_error="ignore", analyzer=nlp_scripts.stemmed_words, n_features=2**18,
@@ -44,6 +45,7 @@ engine = sqlalchemy.create_engine("postgresql://wes@localhost/reddit_db")
 
 for model in models:
 
+    print(model)
     subscribers_ulimit = model["subscribers_ulimit"]
     subscribers_llimit = model["subscribers_llimit"]
     cv_chunks = model["cv_chunks"]
@@ -79,18 +81,17 @@ for model in models:
 
     sgd = load(train_outfile)
     y_pred = sgd.predict(X)
+#   print(precision_recall_fscore_support(y_true, y_pred, average=None))
 #   print(classification_report(y_true, y_pred))
 
     argsorted_dec = sgd.decision_function(X).argsort(axis=1)
     sorted_classes = sgd.classes_[argsorted_dec]
 
     print("k accuracy")
-    for top_n in range(1,100):
+    for top_n in range(1,5):
         score = 0.0
         for i,j in enumerate(sorted_classes):
             if y_true[i] in j.ravel()[::-1][0:top_n]:
                 score += 1.0
         score /= y_true.shape[0] 
         print(f"{top_n} {score}")
-        if (score >= 0.90):
-            break;

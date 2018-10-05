@@ -1,9 +1,12 @@
 # Some functions for NLP
+# Author: Wes Barnett
 
 from re import sub
 from string import punctuation
+
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
+
 
 def process_text(txt):
     """Processes text in preparation for word stemming. Specifically it makes all
@@ -15,6 +18,11 @@ def process_text(txt):
     ----------
     txt : string
         The text to be processed.
+
+    Returns
+    -------
+    txt : string
+        The processed text.
     """
 
     # Make text all lowercase, remove line breaks and tabs
@@ -36,6 +44,7 @@ def process_text(txt):
 
     return txt
 
+
 def stemmed_words(doc):
     """Calls the text cleaner and then does stemming. This should be defined as the
     'analyzer' in CountVectorizer() when called later.
@@ -44,8 +53,14 @@ def stemmed_words(doc):
     ----------
     doc : string
         The text that will be processed and with words that will be stemmed.
+
+    Returns
+    -------
+    tokens : Generator
+       Stemmed and tokenized words. 
     """
     doc = process_text(doc)
     stemmer = PorterStemmer()
-    analyzer = CountVectorizer(decode_error='ignore').build_analyzer()
-    return (stemmer.stem(w) for w in analyzer(doc))
+    analyzer = CountVectorizer(decode_error="ignore").build_analyzer()
+    tokens = (stemmer.stem(w) for w in analyzer(doc))
+    return tokens

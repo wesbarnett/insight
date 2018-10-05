@@ -1,0 +1,22 @@
+# precision, recall, f1, support
+{'subscribers_ulimit': 55000.0, 'subscribers_llimit': 33000.0, 'cv_chunks': 1, 'chunksize': 20000.0, 'table_name': 'submissions_2', 'outfile': 'MODELS/sgd_svm_small.gz', 'train_outfile': 'MODELS/sgd_svm_train_small.gz'}
+804
+(20000, 262144)
+# macro
+(0.43399571211001287, 0.2848244778967115, 0.302058137515065, None)
+# weighted
+(0.6326646311240772, 0.52795, 0.5298613722255817, None)
+{'subscribers_ulimit': 130000.0, 'subscribers_llimit': 55000.0, 'cv_chunks': 1, 'chunksize': 40000.0, 'table_name': 'submissions_1', 'outfile': 'MODELS/sgd_svm_med.gz', 'train_outfile': 'MODELS/sgd_svm_train_med.gz'}
+807
+(40000, 262144)
+# macro
+(0.433910454529972, 0.2677520209535509, 0.29368572604439713, None)
+# weighted
+(0.7108480009561718, 0.62825, 0.633312191211683, None)
+{'subscribers_ulimit': None, 'subscribers_llimit': 130000.0, 'cv_chunks': 1, 'chunksize': 70000.0, 'table_name': 'submissions_0', 'outfile': 'MODELS/sgd_svm_large.gz', 'train_outfile': 'MODELS/sgd_svm_train_large.gz'}
+802
+(70000, 262144)
+# macro
+(0.35914214649582, 0.23134188208962367, 0.23930873108411554, None)
+# weigthed
+(0.5448058817775357, 0.5210285714285714, 0.4865977062551713, None)

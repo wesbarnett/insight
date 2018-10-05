@@ -34,7 +34,7 @@ function handler() {
     }
 }
 
-var string = window.location.href,
+var string = window.location.href;
 substring0 = "submit";
 substring1 = "comments";
 
@@ -64,6 +64,7 @@ chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold', 'oldSubs', 'newSu
 
 		$('#title-field').find('textarea[name="title"]').bindWithDelay("keyup", handler, 150);
 		$('#text-field').find('textarea[name="text"]').bindWithDelay("keyup", handler, 150);
+        handler();
 
 	// ALREADY SUBMITTED ------------------------------------------------
 	} else if ((string.indexOf(substring1) !== -1) && oldSubs) {
