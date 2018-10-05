@@ -39,6 +39,12 @@ def index():
     page['title'] = 'r/eveal'
     return render_template("index.html", page=page)
 
+@app.route("/presentation")
+def presentation():
+    page = {}
+    page['title'] = 'r/eveal'
+    return render_template("presentation.html")
+
 @app.route("/api/add_message/<uuid>", methods=["GET", "POST"])
 def add_message(uuid):
     """
