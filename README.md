@@ -1,6 +1,6 @@
 <img src="logos/reveal.png" width=480>
 
-[Google slides presentation](https://docs.google.com/presentation/d/1tkba056TWMmRuLOZI1_8H25Plhqh_R_RcjWhLC6nOws/edit?usp=sharing)
+[Google slides presentation](https://insight.barnett.science/presentation)
 
 `r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
