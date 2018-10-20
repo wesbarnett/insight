@@ -1,3 +1,5 @@
+"use strict";
+
 document.getElementById('resetButton').addEventListener('click', function() {
     document.getElementById('threshold').value = -10;
     document.getElementById('max_predictions').value = 9;
@@ -23,10 +25,10 @@ document.getElementById('max_predictions').addEventListener('click', function() 
 });
 
 document.getElementById('submitButton').addEventListener('click', function() {
-    threshold = document.getElementById('threshold').value / 10.0
-    max_per_model = document.getElementById('max_predictions').value / 3
-    newSubs = document.getElementById('newSubs').checked;
-    oldSubs = document.getElementById('oldSubs').checked;
+    let threshold = document.getElementById('threshold').value / 10.0
+    let max_per_model = document.getElementById('max_predictions').value / 3
+    let newSubs = document.getElementById('newSubs').checked;
+    let oldSubs = document.getElementById('oldSubs').checked;
     chrome.storage.sync.set({max_per_model: max_per_model, threshold: threshold, oldSubs: oldSubs, newSubs: newSubs}, function() {
         document.getElementById('saved').style.display = "block";
     });

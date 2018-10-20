@@ -1,9 +1,11 @@
+"use strict";
+
 // This is for the "old" Reddit format. May have to look into the new format as well.
 
 // Handles the key press event. Sends the title and text to the remote server to run prediction on
 function handler() {
-	var title = $('#title-field').find('textarea[name="title"]').val();
-	var text = $('#text-field').find('textarea[name="text"]').val();
+	let title = $('#title-field').find('textarea[name="title"]').val();
+	let text = $('#text-field').find('textarea[name="text"]').val();
     if ((title) || (text) ){
         $.ajax
         ({
@@ -13,8 +15,8 @@ function handler() {
             data: JSON.stringify({ "title": title, "text" : text, "max_per_model": max_per_model, "threshold": threshold}),
             contentType: "application/json",
             success: function (result) {
-                myhtml = ""
-                for (var i = 0; i < result.length; i++) {
+                let myhtml = ""
+                for (let i = 0; i < result.length; i++) {
                     myhtml += '<a style="font-size: medium;" target="_blank" href="https://www.reddit.com/r/' + result[i] + '/submit?selftext=true&title=' + title + '&text=' + text +'" class="sr-suggestion" tabindex="100">' + result[i] + '</a>';
                     if (i != result.length-1) {
                         myhtml += ' &middot; '
@@ -34,9 +36,14 @@ function handler() {
     }
 }
 
-var string = window.location.href;
-substring0 = "submit";
-substring1 = "comments";
+const string = window.location.href;
+const substring0 = "submit";
+const substring1 = "comments";
+let uuid;
+let max_per_model;
+let threshold;
+let oldSubs;
+let newSubs;
 
 chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold', 'oldSubs', 'newSubs'], function(result) {
 
@@ -79,8 +86,8 @@ chrome.storage.sync.get(['uuid', 'max_per_model', 'threshold', 'oldSubs', 'newSu
 			contentType: "application/json",
 			success: function (result) {
 				if (result.length > 0) {
-					myhtml = '<div style="font-size: large; line-height: 1.2em"><b>other communities with content like this</b></div>';
-					for (var i = 0; i < result.length; i++) {
+					let myhtml = '<div style="font-size: large; line-height: 1.2em"><b>other communities with content like this</b></div>';
+					for (let i = 0; i < result.length; i++) {
 						myhtml += '<a target="_blank" style="font-size: medium;" href="https://reddit.com/r/' + result[i] + '">' + result[i] + '</a> ';
 						if (i != result.length-1) {
 							myhtml += ' &middot; '
