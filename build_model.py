@@ -79,7 +79,7 @@ def train_val_model(engine, alpha, model, vectorizer, classes, logfile_object):
 
     # Skip hold out test set and validation set
     for i in range(cv_chunks * 2):
-        chunk = next(dlogfile_object)
+        chunk = next(logfile_object)
         print(chunk.iloc[0])
 
     j = 0
@@ -128,7 +128,7 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, logfile_object):
 
     # Skip hold out test set
     for j in range(cv_chunks):
-        chunk = next(dlogfile_object)
+        chunk = next(logfile_object)
 
     # Validation set scoring
     logfile_object.write("Calculating validation score...\n")
@@ -136,7 +136,7 @@ def eval_val_model(sgd_cv, engine, model, vectorizer, logfile_object):
     score_avg = 0.
     for chunk in range(cv_chunks):
 
-        chunk = next(dlogfile_object)
+        chunk = next(logfile_object)
 
         X_val, y_val = parse_data_chunk(chunk, vectorizer)
 
@@ -311,7 +311,7 @@ def train_training_data(engine, best_alpha, model, vectorizer, classes, logfile_
         alpha=best_alpha, n_jobs=3, max_iter=1000, tol=1e-3, random_state=0
     )
 
-    chunk = next(dlogfile_object)  # Skip hold out test set
+    chunk = next(logfile_object)  # Skip hold out test set
     print(chunk.iloc[0])
     X_test, y_test = parse_data_chunk(chunk, vectorizer)
 
