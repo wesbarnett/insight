@@ -1,5 +1,10 @@
 <img src="logos/reveal.png" width=480>
 
+**NOTE: As of 19 Feb 2019, I have shut down the server that sends the predictions from
+the models due to the cost of maintaining the project. If you are interested in seeing
+this project live, feel free to run a local copy of the server on your system and modify
+the Chrome extension, or contact me.**
+
 [Google slides presentation](https://insight.barnett.science/presentation)
 
 `r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
