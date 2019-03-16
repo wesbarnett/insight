@@ -24,10 +24,9 @@ box lists communities related to posts the user is viewing.
 
 ## Installation and usage
 
-Install the Chrome extension from
-[the Chrome web store](https://chrome.google.com/webstore/detail/subreddits-with-content-l/iaepjdnahmaliipimelmheobbdeplhah).
-
-[<img src="screenshots/chromebadge.png">](https://chrome.google.com/webstore/detail/reveal/iaepjdnahmaliipimelmheobbdeplhah)
+After cloning the repository, go to `chrome://extensions` in Chrome. Then select `Load
+unpacked`. Navigate to the cloned repository and select the directory
+`chrome_extension`.
 
 After installing the Chrome extension simply visit [Reddit](https://reddit.com) and prepare to submit your
 text post from any subreddit or from
