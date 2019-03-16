@@ -5,7 +5,7 @@ the models due to the cost of maintaining the project. If you are interested in 
 this project live, feel free to run a local copy of the server on your system and modify
 the Chrome extension, or contact me.**
 
-[Google slides presentation](https://insight.barnett.science/presentation)
+[Presentation (PDF)](https://github.com/wesbarnett/insight/raw/master/Wes_Barnett_Demo.pdf)
 
 `r/eveal` is a Chrome extension to enhance the user experience on Reddit by helping users
 discover new communities based on the content they are submitting or viewing.
